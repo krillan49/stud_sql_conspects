@@ -33,6 +33,9 @@ SELECT
 FROM FamilyMembers
 --#=> Выводим для каждой строки максимум значения колонки из строки другой таблицы по соотв этих строк в значениях Payments.family_member и FamilyMembers.member_id
 
+-- Можно использовать другой запрос после FROM вместо имени таблицы
+select user_id, video_id from (select user_id, video_id, count(distinct video_id) over (partition by user_id) as cnt from user_playlist) t
+
 	-- EXISTS используется в сочетании с подзапросом и считается выполненным, если подзапрос возвращает хотя бы одну строку
 	-- (Операторы SQL, использующие условие EXISTS, очень неэффективны, поскольку подзапрос повторно запускается для КАЖДОЙ строки в таблице внешнего запроса)
 SELECT * FROM customers WHERE EXISTS (SELECT * FROM orders WHERE customers.customer_id = orders.customer_id)
@@ -58,4 +61,4 @@ SELECT id FROM orders EXCEPT SELECT id FROM orders WHERE date IS NOT NULL
 
 
 
--- 
+--

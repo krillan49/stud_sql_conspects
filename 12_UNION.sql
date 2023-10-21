@@ -11,6 +11,8 @@ SELECT first_name, middle_name, last_name FROM Student
 UNION
 SELECT first_name, middle_name, last_name FROM Teacher;                 --#=> объединяем по столбцам ФИО строки данных учеников и учителей
 
+-- UNION ALL не убирает дубликаты
+
 -- INTERSECT Комбинирует два запроса SELECT, но возвращает записи только первого SELECT, которые имеют совпадения во втором элементе SELECT.(работает как UNION ??)
 
 -- EXCEPT Комбинирует два запроса SELECT, но возвращает записи только первого SELECT, которые не имеют совпадения во втором элементе SELECT.(работает как UNION ??)
