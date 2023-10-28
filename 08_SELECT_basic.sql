@@ -82,6 +82,7 @@ SELECT DISTINCT first_name, last_name FROM User;                  --#=> прим
 
 -- DISTINCT ON (исключение дубликатов по столбцу) (возможно придется использовать в подзапросе, чтоб обработать рез потом)
 SELECT DISTINCT ON(team) * FROM employees ORDER BY birth_date DESC  --#=> выбирает уникальные значения по столбцу, отсортированные по дате, тоесть выбраны эти уникальные с самой большой датой
+SELECT DISTINCT ON(user_id, video_id) user_id, video_id FROM user_playlist  --#=> по нескольким столбцам
 
 -- LIMIT - пишется в самом конце запроса, позволяет извлечь определённый диапазон записей из одной или нескольких таблиц.
 -- (Оператор LIMIT реализован не во всех СУБД, например, в MSSQL для вывода записей с начала таблицы используется оператор TOP)
@@ -91,7 +92,8 @@ SELECT * FROM Company LIMIT 3 OFFSET 2;                                         
 SELECT * FROM Company OFFSET 2;                                                                                        --#=> выбираем все кроме 2х первых строк
 
 -- ROW_NUMBER() OVER(ORDER BY SUM(имя_колонки) DESC) - вывести новую колонку порядковых номеров по убыванию относительно значений указанной колонки, которые заполняются автоматически
-SELECT ROW_NUMBER() OVER(ORDER BY SUM(points) DESC) AS rank FROM people;
+SELECT ROW_NUMBER() OVER(ORDER BY points DESC) AS rank FROM people;
+SELECT ROW_NUMBER() OVER(ORDER BY SUM(points) DESC) AS rank FROM people GROUP BY some;
 
 ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY count(*) DESC, category.name) AS category_rank
 --#=> разбивка ранга по значениям столбца(когда новое значения ранг начинается снова с 1)  ???

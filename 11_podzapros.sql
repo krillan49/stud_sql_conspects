@@ -36,6 +36,13 @@ FROM FamilyMembers
 -- Можно использовать другой запрос после FROM вместо имени таблицы
 select user_id, video_id from (select user_id, video_id, count(distinct video_id) over (partition by user_id) as cnt from user_playlist) t
 
+-- Подзапрос таблицы к самой себе. Имитирует GROUP BY по полю supplier_id
+SELECT DISTINCT ON(supplier_id)
+supplier_id,
+(SELECT COUNT(id) FROM products AS o WHERE o.supplier_id = p.supplier_id) AS total_products
+FROM products AS p
+ORDER BY supplier_id DESC
+
 	-- EXISTS используется в сочетании с подзапросом и считается выполненным, если подзапрос возвращает хотя бы одну строку
 	-- (Операторы SQL, использующие условие EXISTS, очень неэффективны, поскольку подзапрос повторно запускается для КАЖДОЙ строки в таблице внешнего запроса)
 SELECT * FROM customers WHERE EXISTS (SELECT * FROM orders WHERE customers.customer_id = orders.customer_id)

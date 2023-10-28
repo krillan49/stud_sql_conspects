@@ -405,6 +405,7 @@ SELECT DISTINCT first_name, last_name FROM User;                  #=> приме
 
 	DISTINCT ON (исключение дубликатов по столбцу) (возможно придется использовать в подзапросе, чтоб обработать рез потом)
 SELECT DISTINCT ON(team) * FROM employees ORDER BY birth_date DESC  #=> выбирает уникальные значения по столбцу, отсортированные по дате, тоесть выбраны эти уникальные с самой большой датой
+SELECT DISTINCT ON(user_id, video_id) user_id, video_id FROM user_playlist  #=> по нескольким столбцам
 
 	LIMIT - пишется в самом конце запроса, позволяет извлечь определённый диапазон записей из одной или нескольких таблиц.
 	(Оператор LIMIT реализован не во всех СУБД, например, в MSSQL для вывода записей с начала таблицы используется оператор TOP)
@@ -414,7 +415,8 @@ SELECT * FROM Company LIMIT 3 OFFSET 2;                                         
 SELECT * FROM Company OFFSET 2;                                                                                        #=> выбираем все кроме 2х первых строк
 
 	ROW_NUMBER() OVER(ORDER BY SUM(имя_колонки) DESC) - вывести новую колонку порядковых номеров по убыванию относительно значений указанной колонки, которые заполняются автоматически
-SELECT ROW_NUMBER() OVER(ORDER BY SUM(points) DESC) AS rank FROM people;
+SELECT ROW_NUMBER() OVER(ORDER BY points DESC) AS rank FROM people;
+SELECT ROW_NUMBER() OVER(ORDER BY SUM(points) DESC) AS rank FROM people GROUP BY some;
 
 	ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY count(*) DESC, category.name) AS category_rank
 #=> разбивка ранга по значениям столбца(когда новое значения ранг начинается снова с 1)  ???
@@ -664,6 +666,13 @@ FROM FamilyMembers
 
 	Можно использовать другой запрос после FROM вместо имени таблицы
 select user_id, video_id from (select user_id, video_id, count(distinct video_id) over (partition by user_id) as cnt from user_playlist) t
+
+	Подзапрос таблицы к самой себе. Имитирует GROUP BY по полю supplier_id
+SELECT DISTINCT ON(supplier_id) 
+  supplier_id, 
+  (SELECT COUNT(id) FROM products AS o WHERE o.supplier_id = p.supplier_id) AS total_products 
+FROM products AS p
+ORDER BY supplier_id DESC
 
 	EXISTS используется в сочетании с подзапросом и считается выполненным, если подзапрос возвращает хотя бы одну строку
 	(Операторы SQL, использующие условие EXISTS, очень неэффективны, поскольку подзапрос повторно запускается для КАЖДОЙ строки в таблице внешнего запроса)
