@@ -58,6 +58,8 @@ SELECT name, COALESCE(bonus1, bonus2, 1000000) AS bonus FROM table_name         
 SELECT COALESCE(NULLIF(name,''), '[product name not found]') AS name FROM eusales             --#=> при помощи NULLIF меняем пустые строки на NULL чтобы применить COALESCE
 
 
+-- [постгресс] bool_or(column = value)  Если значение равно значению столбца вернет true иначе false
+select username, bool_or(role = 'internal') as internal, bool_or(role = 'admin') as admin from user_roles
 
 
 
@@ -70,4 +72,6 @@ SELECT COALESCE(NULLIF(name,''), '[product name not found]') AS name FROM eusale
 
 
 
--- 
+
+
+--
