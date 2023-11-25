@@ -19,8 +19,9 @@ SELECT *, 'US' AS location FROM ussales  -- если нужно добавить
 SELECT "Строка" AS String                      -- литерал "Строка" в столбце с псевдонимом String
 SELECT member_name AS Name FROM FamilyMembers  -- выводим поле с другим названием при помощи псевдонима
 SELECT member_name Name FROM FamilyMembers     -- AS писать не обязательно, можно просто через пробел
-SELECT * FROM Customers C WHERE C.Id < 5       -- псевдоним таблицы, определение после FROM и использование при работе с WHERE
+SELECT * FROM Customers C WHERE C.Id < 5       -- псевдоним таблицы, определение после FROM и использование с WHERE
 SELECT name AS 'Имя' FROM people               -- [MySQL ?] псевдоним колонки name русским шрифтом
+SELECT Tim.id 'tim.id' FROM Tim                -- [MySQL ?] вариант псевдонимов
 
 
 
@@ -48,6 +49,8 @@ SELECT CONCAT(first, '+', mid, 'k', last) AS title FROM names   -- объеди�
 SELECT CONCAT_WS(' ', first, mid, last) AS title FROM names     -- тоже самое что и выше, но если между значениями нужен одинаковый элемент(тут пробел)
 SELECT first_name || ' ' || last_name AS full_name FROM rentals -- [postgresql ??] тоже что и 2 выше
 SELECT SPLIT_PART(chars, ',', 1) AS char FROM monsters          -- [postgresql ??] разбивает строку chars по ',' и выбирает 1й из разбитых кусков
+REPLACE(x, 'a', 'b')                    -- замена одиночных символов на другие одиночные('a' to 'b')
+FORMAT('Hello, %s how are you doing today?', some)  -- подставит some в позицию %s
 
 -- PostgreSQL индексация строк начинается с 1, а не с 0. Таким образом, первый символ строки находится в позиции 1
 
@@ -81,6 +84,15 @@ SELECT DATE_TRUNC('month', created_at)::DATE AS date FROM posts GROUP BY date  -
 -- DATEDIFF(interval, from, to): interval - дни/месяцы/годы. от даты from до даты to
 SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders          --> тут (day, OrderTime, DeliveryTime) расчет количества дней между OrderTime и DeliveryTime
 
+-- Аналог DATEDIFF для PostgreSQL
+DATE_PART('year', last) - DATE_PART('year', first)                       -- Years   == DATEDIFF(yy, first, last)
+years_diff * 12 + (DATE_PART('month', last) - DATE_PART('month', first)) -- Months  == DATEDIFF(mm, first, last)
+DATE_PART('day', last - first)                                           -- Days    == DATEDIFF(dd, first, last)
+TRUNC(DATE_PART('day', last - start)/7)                                  -- Weeks   == DATEDIFF(wk, first, last)
+days_diff * 24 + DATE_PART('hour', last - first )                        -- Hours   == DATEDIFF(hh, first, last)
+hours_diff * 60 + DATE_PART('minute', last - first )                     -- Minutes == DATEDIFF(mi, first, last)
+minutes_diff * 60 + DATE_PART('minute', last - first )                   -- Seconds == DATEDIFF(ss, first, last)
+
 -- TIMESTAMPDIFF(SECOND, time_out, time_in) - среднее время в секундах между time_out и time_in
 SELECT TIMESTAMPDIFF(SECOND, time_out, time_in) AS time FROM Trip               --> время полета
 
@@ -101,6 +113,8 @@ SELECT GREATEST(1, 2, 3)                                           -- [postgresq
 -- ROUND(22.29, 1) - 1й параметр флоат число, 2й число знаков до которых будет округление(без 2го параметра округляет до целого)
 SELECT ROUND(22.29, 1);                                  --> 22.3
 SELECT ROUND(22.29, -1)                                  --> 20
+SELECT *, FLOOR(hours * 0.5) AS liters FROM cycling      --> округление вниз
+SELECT *, CEIL(yr::FLOAT/100) AS century FROM years      --> округление вверх
 SELECT ROUND(salary)::FLOAT AS av_salary FROM job        --> [PostgreSQL] округление и преобразование во флоат(из такого 0.29e0)
 SELECT ROUND(val::NUMERIC, 2)::FLOAT AS num FROM float8  --> [PostgreSQL] округление до 2х знаков необходимо переводить в NUMERIC если есть параметр(2) и ошибка
 
