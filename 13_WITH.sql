@@ -33,6 +33,14 @@ SELECT * FROM Aeroflot_Don WHERE id > 10
 
 
 
+--  ?? Почемуто нельзя использовать как подзапрос(в постгрэ или везе ??) вот так
+WITH p3 AS
+  (SELECT DISTINCT customer_id FROM orders WHERE product_name = 'Product 3')
+SELECT * FROM orders WHERE orders.customer_id NOT IN p3;
+
+
+
+
 
 
 
