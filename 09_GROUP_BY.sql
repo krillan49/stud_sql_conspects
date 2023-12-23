@@ -22,13 +22,14 @@ GROUP BY ROLLUP(name, month, day)
 
 
 -- GROUPING SETS() [Postgres  ??]  - группировка по разному коллич полей сразу по кастомным наборам
-
 SELECT name, EXTRACT(MONTH FROM date) AS month, EXTRACT(DAY FROM date) AS day, SUM(price * count) AS total FROM products
 GROUP BY GROUPING SETS ((name, month), (name, month, day), (name, day), (name))
 
 
 
 --                                             Агрегатные функции
+
+-- https://www.postgresql.org/docs/current/functions-aggregate.html
 
 -- Агрегатная функция – это функция, которая выполняет вычисление на наборе значений и возвращает одиночное значение.
 -- Запрос с агрегатной функцией без GROUP BY обрабатывает всю таблицу и возвращает одну строку
@@ -60,9 +61,18 @@ SELECT PERCENTILE_DISC(0.5) WITHIN GROUP (ORDER BY score) AS median FROM result 
 SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY some) AS median FROM result   -- больше подходит для непрерывных значений ??
 
 
+-- Оконные функции RANK() OVER другая тема отдельня от агрегатных функций и применяются втч без группировки
+
 -- RANK() [PostgreSQL] Функция RANK()присваивает ранг каждой строке/подгруппе в разделе результирующего набора.
 SELECT sale, RANK() OVER(ORDER BY sale DESC) AS srank FROM sales GROUP BY sale             -- создаем колонку рангов цен у наибольшей(DESC) лучший ранг(1й) у одинаковых одинаковый ранг.
 SELECT sale, RANK() OVER(ORDER BY sale DESC, some DESC) AS srank FROM sales GROUP BY sale  -- ранг по 2м полям, если 1е равно использует 2е
+
+
+-- PARTITION BY [postgresql  + ??]   Разбиение группировки по значениям столбца
+SELECT COUNT(*) OVER (PARTITION BY supplier_id) total_products FROM products
+
+-- PARTITION BY + ORDER BY
+SELECT depname, empno, salary, RANK() OVER (PARTITION BY depname ORDER BY salary DESC) FROM empsalary;
 
 
 -- ARRAY_AGG(column, order) [PostgreSQL ??] создание массива из сгруппированных значений столбца, с возможностью сортировки массива
@@ -79,6 +89,11 @@ SELECT id, COUNT(*) AS Count FROM Orders GROUP BY id HAVING COUNT(*) > 5;  -- о
 SELECT home_type, AVG(price) AS avg_price FROM Rooms GROUP BY home_type HAVING avg_price > 50;  -- отфильтрует только те сгруппированные данные по типам домов где средняя цена больше 50
 SELECT home_type, MIN(price) AS min FROM Rooms WHERE price > 30 GROUP BY home_type HAVING COUNT(*) >= 5; -- выводит только для тех типов с ценой больше 30, которых есть >= 5
 SELECT name AS total_rentals FROM customer GROUP BY name HAVING 'NC-17' != ALL(ARRAY_AGG(f.rating));  -- используем HAVING с колонкой которую не выводим
+
+
+-- ?? Проверить только для HAVING или и группировать можно по ней
+-- EVERY   -  EVERY ( boolean ) => boolean. [PostgreSQL] тоесть где все сгруппированные значения соответствуют условию (true)
+SELECT customer_id FROM orders GROUP BY customer_id HAVING EVERY(delivery_date IS NULL) ORDER BY 1 DESC;
 
 
 
