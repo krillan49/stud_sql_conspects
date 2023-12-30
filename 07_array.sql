@@ -34,11 +34,26 @@ SELECT UNNEST(special_features) AS feature FROM film
 --                                        Преобразомание массива в текст
 
 -- PostgreSQL предлагает встроенную функцию массива с именем ARRAY_TO_STRING() , которая принимает три аргумента: массив, разделитель/разделитель и текст для замены нулевых значений. Функция ARRAY_TO_STRING() преобразует заданный массив в строки и объединяет строки с помощью разделителя/разделителя. Тип возвращаемого значения функции ARRAY_TO_STRING() — ТЕКСТ
-SELECT ARRAY_TO_STRING(arr, ':' , '-' ) FROM st_information;
+SELECT ARRAY_TO_STRING(arr, ':' , '-') FROM st_information;
 -- arr - колонка с массивом
 -- ':' - элемент который будет делить элементы массива в строке
 -- '-' - элемент который заменит значения NULL из массива
 
+
+
+--                                       Преобразомание строки в массив
+
+-- PostgreSQL функция STRING_TO_ARRAY разбивает строку по указанным разделителям в массив
+SELECT STRING_TO_ARRAY('a,b,c', ',') FROM user_tags            --> {a, b, c}
+
+
+--                                         Получение значений массивов
+
+-- https://postgrespro.ru/docs/postgresql/15/arrays
+
+-- Индексы элементов массива записываются в квадратных скобках. По умолчанию в PostgreSQL действует соглашение о нумерации элементов массива с 1
+SELECT pay_by_quarter[3] FROM sal_emp:                   -- 1й элемет массива pay_by_quarter
+(ARRAY_AGG(class ORDER BY class DESC))[1]                -- при генерации при шруппировке надо взять в скобки
 
 
 

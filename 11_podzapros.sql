@@ -71,6 +71,16 @@ SELECT id FROM orders EXCEPT SELECT id FROM orders WHERE date IS NOT NULL
 
 
 
+-- Подзапрос после FROM (запрос от подзапроса)
+SELECT class, count(class)
+FROM (
+  SELECT user_id, MAX(class) AS class
+  FROM users
+  GROUP BY user_id) AS subquery
+GROUP BY class
+
+
+
 
 
 

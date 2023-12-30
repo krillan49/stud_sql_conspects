@@ -91,6 +91,9 @@ SELECT EXTRACT(MONTH FROM payment_date) AS month FROM payment     -- [postgresql
 EXTRACT(DOW FROM created_at)                                      -- dow - день недели 0 for Sunday, 1 for Monday, 6 for Saturday
 to_char(rental_date, 'dy')                                        -- день недели: Sun, Mon, Sat
 
+current_date - INTERVAL '60 years'                                -- количество лет от даты до сейчас
+AGE(birthdate) >= '60 years'                                      -- количество лет от даты до сейчас
+
 -- Обрезка дат в [postgresql]  DATE_TRUNC(field, source [, time_zone ]) (Значения для обрезки: microseconds milliseconds second minute hour day week month quarter year decade century millennium)
 SELECT DATE_TRUNC('hour', timestamp '2020-06-30 17:29:31');                    --> 2020-06-30 17:00:00  - все дальше часа будет нулями
 SELECT DATE_TRUNC('hour', timestamp with time zone '2020-06-30 17:29:31+00')   --> 2020-07-01 03:00:00+10

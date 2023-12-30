@@ -102,6 +102,9 @@ SELECT s.results FROM strings
 CROSS JOIN LATERAL unnest(string_to_array(string, ' ')) AS s(results)  --#=> тут results название столбца на выходе а s - хз что (мб s(results) просто имя те скобки не функциональны ??)
 
 
+-- Использование псевдонимов чтобы группировать одну таблицу саму с собой
+select managers.id, managers.name from employees managers join employees subordinates
+
 
 
 
