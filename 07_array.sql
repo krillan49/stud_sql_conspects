@@ -45,6 +45,8 @@ SELECT ARRAY_TO_STRING(arr, ':' , '-') FROM st_information;
 
 -- PostgreSQL функция STRING_TO_ARRAY разбивает строку по указанным разделителям в массив
 SELECT STRING_TO_ARRAY('a,b,c', ',') FROM user_tags            --> {a, b, c}
+-- PostgreSQL функция regexp_split_to_array разбивает строку по указанным regexp-разделителям в массив
+regexp_split_to_array('hello world', '\s+')                    --> {hello,world}
 
 
 --                                         Получение значений массивов
@@ -54,6 +56,11 @@ SELECT STRING_TO_ARRAY('a,b,c', ',') FROM user_tags            --> {a, b, c}
 -- Индексы элементов массива записываются в квадратных скобках. По умолчанию в PostgreSQL действует соглашение о нумерации элементов массива с 1
 SELECT pay_by_quarter[3] FROM sal_emp:                   -- 1й элемет массива pay_by_quarter
 (ARRAY_AGG(class ORDER BY class DESC))[1]                -- при генерации при шруппировке надо взять в скобки
+SELECT pay_by_quarter[:3] FROM sal_emp:                  -- элементы с 1го по 3й включительно
+SELECT pay_by_quarter[3:] FROM sal_emp:                  -- элементы с 3го по последний включительно
+SELECT pay_by_quarter[2:3] FROM sal_emp:                 -- элементы с 2го по 3й включительно
+SELECT pay_by_quarter[2:3][1:3] FROM sal_emp:            -- элементы с 1го по 3й включительно из подмассивов со 2го по 3й
+SELECT arr[array_upper(arr, 1)];                         -- последний элемент массива
 
 
 

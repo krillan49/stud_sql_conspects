@@ -60,7 +60,7 @@ SELECT IFNULL(some, "Альтернатива SQL Academy") AS sql_trainer;
 
 
 
---                                          NULLIF (условная функция)
+--                                          NULLIF (условная функция) (работает в постгрэ)
 
 -- NULLIF(значение_1, значение_2) - возвращает NULL, если значение_1 равно значению_2, в противном случае возвращает значение_1(тоесть колонку для проверки ставим в 1)
 SELECT NULLIF("SQL Academy", "SQL Academy") AS sql_trainer;                 --> <NULL>

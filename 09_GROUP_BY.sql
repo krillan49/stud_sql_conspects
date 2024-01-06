@@ -96,6 +96,33 @@ SELECT name AS total_rentals FROM customer GROUP BY name HAVING 'NC-17' != ALL(A
 SELECT customer_id FROM orders GROUP BY customer_id HAVING EVERY(delivery_date IS NULL) ORDER BY 1 DESC;
 
 
+-- Применение условного оператора функции группировки
+SELECT
+  product_id,
+  COUNT(product_id) AS total_unique_variants,
+  COUNT(CASE in_stock WHEN true THEN 1 ELSE null END) AS in_stock_variants
+FROM product_variants
+  GROUP BY product_id
+
+-- применение еще всякого в условиях группировки
+select
+  product_id, count(distinct(color_id, size_id)) as total_unique_variants,
+  count(distinct(color_id, size_id)) filter (where in_stock) as in_stock_variants from product_variants p
+group by 1
+
+SELECT
+  product_id,
+  COUNT(DISTINCT(color_id, size_id)) AS total_unique_variants,
+  SUM (in_stock::integer) AS in_stock_variants
+FROM product_variants
+GROUP BY product_id
+
+-- Суммирует все строки до по условиям группировки OVER(ORDER BY date, id) включая данную
+SELECT *, SUM(CASE WHEN operation = 'add' THEN amount WHEN operation = 'remove' THEN -amount ELSE 0 END) OVER(ORDER BY date, id) AS flexible_sum
+FROM transactions
+ORDER BY date, id;
+
+
 
 
 

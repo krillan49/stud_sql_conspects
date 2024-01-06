@@ -76,6 +76,7 @@ SELECT * FROM books WHERE TO_TSVECTOR('english', books.name) @@ TO_TSQUERY('engl
 
 -- ORDER BY позволяет вывести по определенному(по умолчанию от наименьшего) порядку(например значений некого столбца)
 -- (ORDER BY пишется после WHERE и после GROUP_BY но перед LIMIT)
+-- Можно сортировать по колонкам таблицы, которые не выводятся данным запросом
 
 SELECT name FROM Company ORDER BY name;                       --> сортируем строки по значениям столбца name
 SELECT * FROM Orders WHERE Time > '2013-01-15' ORDER BY Time  --> отображаем порядок строк по значениям столбца "OrderTime"

@@ -51,7 +51,8 @@ SELECT REPEAT(name, 3) AS name FROM monsters    -- REPEAT(стобец, числ
 SELECT CONCAT(first, '+', mid, 'k', last) AS title FROM names   -- объединение строковых значений столбцов в один столбец с добавлением доп строчных элементов
 SELECT CONCAT_WS(' ', first, mid, last) AS title FROM names     -- тоже самое что и выше, но если между значениями нужен одинаковый элемент(тут пробел)
 SELECT first_name || ' ' || last_name AS full_name FROM rentals -- [postgresql ??] тоже что и 2 выше
-SELECT SPLIT_PART(chars, ',', 1) AS char FROM monsters          -- [postgresql ??] разбивает строку chars по ',' и выбирает 1й из разбитых кусков
+SELECT SPLIT_PART(chars, ',', 1) AS char FROM monsters          -- [postgresql] разбивает строку chars по ',' и выбирает 1й из разбитых кусков
+SELECT SPLIT_PART(chars, ',', -1) AS char FROM monsters         -- [postgresql] последний элемент (работает только в новых версиях)
 REPLACE(x, 'a', 'b')                    -- замена одиночных символов на другие одиночные('a' to 'b')
 FORMAT('Hello, %s how are you doing today?', some)  -- подставит some в позицию %s
 
@@ -102,7 +103,7 @@ SELECT DATE_TRUNC('month', created_at)::DATE AS date FROM posts GROUP BY date  -
 -- DATEDIFF(interval, from, to): interval - дни/месяцы/годы. от даты from до даты to
 SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders          --> тут (day, OrderTime, DeliveryTime) расчет количества дней между OrderTime и DeliveryTime
 
--- Аналог DATEDIFF для PostgreSQL
+-- Аналог DATEDIFF для PostgreSQL (?? даты безвремени отнимаются по умолчанию в днях без DATEDIFF)
 DATE_PART('year', last) - DATE_PART('year', first)                       -- Years   == DATEDIFF(yy, first, last)
 years_diff * 12 + (DATE_PART('month', last) - DATE_PART('month', first)) -- Months  == DATEDIFF(mm, first, last)
 DATE_PART('day', last - first)                                           -- Days    == DATEDIFF(dd, first, last)
