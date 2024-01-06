@@ -122,6 +122,7 @@ SELECT CAST(id AS TEXT) AS textid FROM monsters;                   -- преоб
 SELECT hits::FLOAT / at_bats AS batting_average FROM yankees       -- [postgresql] преобразование типов данных(тут INTEGER в FLOAT)
 SELECT (hits::FLOAT/at_bats)::TEXT AS batting_average FROM yankees -- [postgresql] преобразование типов данных
 TO_CHAR(num, 'FM999990.0%')                                        -- [PostgreSQL ??] перевод в строку с определенным числом нулей после точки и еще всяким(тут символ %)
+::inet                                                             -- [PostgreSQL] преобразование айпиадреса в число, где последний член это единицы, предпоследний *256, 2й *256*256, 1й *256*256*256
 
 
 
