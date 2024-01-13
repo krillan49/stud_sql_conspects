@@ -93,7 +93,8 @@ EXTRACT(DOW FROM created_at)                                      -- dow - де�
 to_char(rental_date, 'dy')                                        -- день недели: Sun, Mon, Sat
 
 current_date - INTERVAL '60 years'                                -- количество лет от даты до сейчас
-AGE(birthdate) >= '60 years'                                      -- количество лет от даты до сейчас
+AGE(birthdate)                                                    --> '60 years'   те число лет от даты до сейчас
+AGE(birthdate) >= '60 years'                                      --> true    можно сравнивать
 
 -- Обрезка дат в [postgresql]  DATE_TRUNC(field, source [, time_zone ]) (Значения для обрезки: microseconds milliseconds second minute hour day week month quarter year decade century millennium)
 SELECT DATE_TRUNC('hour', timestamp '2020-06-30 17:29:31');                    --> 2020-06-30 17:00:00  - все дальше часа будет нулями
@@ -114,6 +115,10 @@ minutes_diff * 60 + DATE_PART('minute', last - first )                   -- Seco
 
 -- TIMESTAMPDIFF(SECOND, time_out, time_in) - среднее время в секундах между time_out и time_in
 SELECT TIMESTAMPDIFF(SECOND, time_out, time_in) AS time FROM Trip               --> время полета
+
+-- https://www.postgresql.org/docs/current/functions-formatting.html  Форматирование даты [postgresql]
+to_char(timestamp, 'FMmonth, YYYY FMDD HH12:MI:SS')            --> 	february, 2023 19 12:00:00
+to_char(timestamp, 'FMMonth, YYYY FMDD HH12:MI:SS')            --> 	February, 2023 19 12:00:00
 
 
 
@@ -138,11 +143,11 @@ SELECT ROUND(salary)::FLOAT AS av_salary FROM job        --> [PostgreSQL] окр
 SELECT ROUND(val::NUMERIC, 2)::FLOAT AS num FROM float8  --> [PostgreSQL] округление до 2х знаков необходимо переводить в NUMERIC если есть параметр(2) и ошибка
 MOD(number, 2)                                           -- остаток от деления number на 2
 POWER(n, 3)::int                                         -- [PostgreSQL ??] возведение в степень
-sqrt( number )                                           -- [PostgreSQL ??] корень квадратный
+SQRT( number )                                           -- [PostgreSQL ??] корень квадратный
 
 
 
--- DISTINCT (исключение дубликатов) - позволяет исключить одинаковые значения в выводе, если нам нужны только уникальные
+-- DISTINCT (исключение дубликатов) - позволяет исключить одинаковые значения в выводе, если нам нужны только уникальные, дубликаты исключаются из результата запроса, те DISTINCT испольняется после всех остальных действий
 SELECT DISTINCT class FROM Student_in_class;     --> выбираем все уникальные значения столбца class, иключив все дубликаты
 SELECT DISTINCT first_name, last_name FROM User; --> применяя к нескольким столбцам исключаются только те строки в которых значения строк одинаковы во всех выбранных стобцах
 

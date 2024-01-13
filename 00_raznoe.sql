@@ -5,6 +5,10 @@
 
 
 
+-- https://www.postgresql.org/docs/current/functions-net.html   -- функции для айпи адресов
+
+
+
 
 
 
