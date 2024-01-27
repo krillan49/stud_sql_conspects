@@ -77,6 +77,11 @@ SELECT GENERATE_SERIES(2, 100) AS nums                                  -- Со�
 SELECT GENERATE_SERIES(2, 10, 2)                                        -- 2, 4, 6, 8, 10
 SELECT GENERATE_SERIES('2005-05-24', '2005-06-02', INTERVAL '1 day')    -- с датами и заданным интервалом
 
+-- 2 колонки с интервалами по часу
+SELECT
+GENERATE_SERIES('2023-07-16 08:00:00', '2023-07-16 17:00:00', INTERVAL '1 hour') AS time_from,
+GENERATE_SERIES('2023-07-16 09:00:00', '2023-07-16 18:00:00', INTERVAL '1 hour') AS time_to
+
 -- используем для размножения строк в зависимости от цифры в quantity_in_stock
 SELECT product_id, product_name, quantity_in_stock, GENERATE_SERIES(1, quantity_in_stock) AS n FROM products
 -- тоже самое без создания доп колонки

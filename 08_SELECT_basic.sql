@@ -136,6 +136,7 @@ AGE(birthdate) >= '60 years'                                      --> true    м
 SELECT DATE_TRUNC('hour', timestamp '2020-06-30 17:29:31');                    --> 2020-06-30 17:00:00  - все дальше часа будет нулями
 SELECT DATE_TRUNC('hour', timestamp with time zone '2020-06-30 17:29:31+00')   --> 2020-07-01 03:00:00+10
 SELECT DATE_TRUNC('month', created_at)::DATE AS date FROM posts GROUP BY date  --> реальный пример с переводом в дату в конце и группировкой по дате(2022-10-01)
+DATE_TRUNC('week', CURRENT_DATE - INTERVAL '1 week') -- предыдущая законченная неделя перед этой
 
 -- DATEDIFF(interval, from, to): interval - дни/месяцы/годы. от даты from до даты to
 SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders         --> тут (day, OrderTime, DeliveryTime) расчет количества дней между OrderTime и DeliveryTime
@@ -189,6 +190,10 @@ ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY count(*) DESC, category.name) A
 -- RANK() OVER(ORDER BY SUM(имя_колонки) DESC) - работает так же как ROW_NUMBER() только при одинаковых значениях ставит одинаковый ранг. Дальнейший ранг учитывает все столбцы до, например 1, 1, 3
 
 -- DENSE_RANK() OVER(ORDER BY SUM(имя_колонки) DESC) - работает так же как ROW_NUMBER() только при одинаковых значениях ставит одинаковый ранг. Дальнейший ранг не учитывает все столбцы до, например 1, 1, 2
+
+
+-- Делаем ранк нечетным (1, 3, 5 ...). Соотв четным без "- 1"
+SELECT *, (ROW_NUMBER() OVER(ORDER BY birth_date DESC)) * 2 - 1 AS rank FROM employees
 
 
 

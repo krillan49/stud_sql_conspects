@@ -78,6 +78,7 @@ SELECT depname, empno, salary, RANK() OVER (PARTITION BY depname ORDER BY salary
 -- ARRAY_AGG(column, order) [PostgreSQL ??] создание массива из сгруппированных значений столбца, с возможностью сортировки массива
 SELECT name, ARRAY_AGG(rating) AS total_rentals FROM customer GROUP BY name     -- группируем по имени, создавая массив всех рэйтингов к нему относящихся
 SELECT ARRAY_AGG(name ORDER BY id DESC) AS names FROM students GROUP BY subject -- группируем имена в массив, в котором они будут отсортированы по столбцу id в порядке убывания
+SELECT manager_id, ARRAY_AGG(name || ' - ' || id ORDER BY id) AS employee_names FROM employees WHERE GROUP BY manager_id
 
 
 
@@ -121,6 +122,10 @@ GROUP BY product_id
 SELECT *, SUM(CASE WHEN operation = 'add' THEN amount WHEN operation = 'remove' THEN -amount ELSE 0 END) OVER(ORDER BY date, id) AS flexible_sum
 FROM transactions
 ORDER BY date, id;
+
+
+-- Сложная функция от условий
+sum(count*(handedness='Right-handed')::int) "Right-handed"
 
 
 
