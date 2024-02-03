@@ -39,6 +39,9 @@ SELECT DISTINCT first_name, last_name FROM User;   --> применяя к не�
 SELECT DISTINCT ON(team) * FROM employees ORDER BY birth_date DESC  --> выбирает уникальные значения по столбцу, отсортированные по дате, тоесть выбраны уникальные team с самой большой датой (DISTINCT работает после сортировки)
 SELECT DISTINCT ON(user_id, video_id) user_id, video_id FROM user_playlist  --> по нескольким столбцам
 
+-- ?? При группировке обычный вариант работает както странно и лучше делать так ??
+select date, count(distinct customer_id) num_new_customers
+from customer_purchases group by date order by date
 
 
 --                                                     LIMIT
@@ -107,7 +110,7 @@ SELECT city_name FROM stations WHERE city_name ~ '^[AEIOU]'        -- ищет �
 SELECT SUBSTRING(greeting FROM '#\d+') AS user_id FROM greetings   -- Bienvenido tal #470815 BD.  ->  #470815
 
 -- REGEXP_REPLACE(строка, регулярка, элемент замены, позиция(число, не обязательно))  -  заменить элементы строки
-SELECT REGEXP_REPLACE('1, 4, и 10 числа', '\d','@','g')  FROM dual      --> '@, @, и @@ числа' меняем любую цифру на @ ([postgresql] само меняет только 1й, нужно добавить 'g'; [ORACLE PL/SQL] - само меняет все цифры те флаг 'g' не нужен)
+SELECT REGEXP_REPLACE('1, 4, и 10 числа', '\d','@','g') FROM dual      --> '@, @, и @@ числа' меняем любую цифру на @ ([postgresql] само меняет только 1й, нужно добавить 'g'; [ORACLE PL/SQL] - само меняет все цифры те флаг 'g' не нужен)
 SELECT REGEXP_REPLACE(str, '[aeiou]', '', 'gi') AS res FROM disemvowel  -- 2 флага для регулярки
 SELECT REGEXP_REPLACE('John Doe', '(.*) (.*)', '\2, \1');               --> 'Doe, John'
 
@@ -141,10 +144,11 @@ DATE_TRUNC('week', CURRENT_DATE - INTERVAL '1 week') -- предыдущая з�
 -- DATEDIFF(interval, from, to): interval - дни/месяцы/годы. от даты from до даты to
 SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders         --> тут (day, OrderTime, DeliveryTime) расчет количества дней между OrderTime и DeliveryTime
 
--- Аналог DATEDIFF для PostgreSQL (?? даты без времени отнимаются по умолчанию в днях без DATEDIFF)
+-- Аналог DATEDIFF для PostgreSQL
+-- даты без времени отнимаются по умолчанию в днях без DATEDIFF/DATE_PART
 DATE_PART('year', last) - DATE_PART('year', first)                       -- Years   == DATEDIFF(yy, first, last)
 years_diff * 12 + (DATE_PART('month', last) - DATE_PART('month', first)) -- Months  == DATEDIFF(mm, first, last)
-DATE_PART('day', last - first)                                           -- Days    == DATEDIFF(dd, first, last)
+DATE_PART('day', last - first)                                           -- Days(день месяца)    == DATEDIFF(dd, first, last)
 TRUNC(DATE_PART('day', last - start)/7)                                  -- Weeks   == DATEDIFF(wk, first, last)
 days_diff * 24 + DATE_PART('hour', last - first )                        -- Hours   == DATEDIFF(hh, first, last)
 hours_diff * 60 + DATE_PART('minute', last - first )                     -- Minutes == DATEDIFF(mi, first, last)
@@ -187,13 +191,30 @@ SELECT ROW_NUMBER() OVER(ORDER BY SUM(points) DESC) AS rank FROM people GROUP BY
 -- ROW_NUMBER() OVER(PARTITION BY
 ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY count(*) DESC, category.name) AS category_rank  --> разбивка ранга по значениям столбца(когда новое значения ранг начинается снова с 1)  ???
 
+-- PARTITION BY + ORDER BY
+SELECT depname, empno, salary, RANK() OVER (PARTITION BY depname ORDER BY salary DESC) FROM empsalary;
+-- Разбивает ранк на подразделы по depname, те лоя каждого значения depname будет свой ранк(те с каждым новым значением depname, ранк заново считается с единицы)
+
 -- RANK() OVER(ORDER BY SUM(имя_колонки) DESC) - работает так же как ROW_NUMBER() только при одинаковых значениях ставит одинаковый ранг. Дальнейший ранг учитывает все столбцы до, например 1, 1, 3
+SELECT sale, RANK() OVER(ORDER BY sale DESC) AS srank FROM sales            -- создаем колонку рангов цен у наибольшей(DESC) лучший ранг(1й) у одинаковых одинаковый ранг.
+SELECT sale, RANK() OVER(ORDER BY sale DESC, some DESC) AS srank FROM sales  -- ранг по 2м полям, если 1е равно использует 2е
 
 -- DENSE_RANK() OVER(ORDER BY SUM(имя_колонки) DESC) - работает так же как ROW_NUMBER() только при одинаковых значениях ставит одинаковый ранг. Дальнейший ранг не учитывает все столбцы до, например 1, 1, 2
 
 
 -- Делаем ранк нечетным (1, 3, 5 ...). Соотв четным без "- 1"
 SELECT *, (ROW_NUMBER() OVER(ORDER BY birth_date DESC)) * 2 - 1 AS rank FROM employees
+
+
+
+--                                          ?? FILTER
+
+-- ??
+SELECT
+  order_id,
+  order_id - MAX(order_id) FILTER(WHERE status_code = 4) OVER(ORDER BY order_id) AS sbn
+FROM order_status
+-- Тоесть берем части таблицы между строками со значениями 4 в столбце status_code и заполняем их значениями  order_id - MAX(order_id)
 
 
 

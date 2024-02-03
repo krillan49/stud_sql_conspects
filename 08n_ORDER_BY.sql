@@ -20,12 +20,15 @@ ORDER BY CASE WHEN sex = 'Male' THEN 1 WHEN sex = 'Female' THEN 2 ELSE 3 END
 
 
 -- Сорьтровка по условию
-select * from employees where team = 'backend' order by least(
-  2 * row_number() over (order by birth_date desc) - 1,
-  2 * row_number() over (order by birth_date)
+SELECT * FROM employees WHERE team = 'backend' ORDER BY LEAST(
+  2 * ROW_NUMBER() OVER (ORDER BY birth_date DESC) - 1,
+  2 * ROW_NUMBER() OVER (ORDER BY birth_date)
 )
 
 
+-- Сортировка по ROW_NUMBER()
+SELECT customer_id, is_return FROM orders
+ORDER BY customer_id, ROW_NUMBER() OVER (PARTITION BY customer_id, is_return), is_return DESC
 
 
 
@@ -40,4 +43,6 @@ select * from employees where team = 'backend' order by least(
 
 
 
--- 
+
+
+--
