@@ -82,6 +82,7 @@ TO_CHAR(num, 'FM999990.0%')                                        -- [PostgreSQ
 SELECT UPPER("Hello world") AS upstring;        --> "HELLO WORLD". Возвращает строку в верхнем регистре в колонке upstring
 SELECT LOWER('SQL Academy') AS lowstring;       --> "sql academy"  Возвращает строку в нижнем регистре в колонке lowstring
 SELECT INSTR('sql-academy', 'academy') AS idx;  --> 5  Возвращает позицию первого символа подстроки в строке
+position('om' in 'Thomas')                      --> [PostgreSQL] 3 Возвращает позицию первого символа подстроки в строке
 SELECT LENGTH('sql-academy') AS str_length;     --> 11 Возвращает длину указанной строки
 SELECT LEFT('sql-academy', 3);                  --> "sql" Возвращает заданное количество крайних левых символов строки
 SELECT RIGHT('XYZ', - 1)                        --> 'YZ'  оставляем все символы справа кроме первого
