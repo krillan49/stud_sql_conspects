@@ -183,14 +183,14 @@ GCD(1071, 462)                                           -- 21  Наибольш
 
 
 
---                        Функции для вывода новых колонок по определенному порядку
+--                        Функции(Window Functions) для вывода новых колонок по определенному порядку
 
 -- ROW_NUMBER() OVER(ORDER BY SUM(имя_колонки) DESC) - вывести новую колонку порядковых номеров по убыванию относительно значений указанной колонки
 SELECT ROW_NUMBER() OVER(ORDER BY points DESC) AS rank FROM people;
 SELECT ROW_NUMBER() OVER(ORDER BY SUM(points) DESC) AS rank FROM people GROUP BY some;
 
 -- ROW_NUMBER() OVER(PARTITION BY
-ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY count(*) DESC, category.name) AS category_rank  --> разбивка ранга по значениям столбца(когда новое значения ранг начинается снова с 1)  ???
+ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY count(*) DESC, category.name DESC) AS category_rank  --> разбивка ранга по значениям столбца(когда новое значения ранг начинается снова с 1)  ???
 
 -- PARTITION BY + ORDER BY
 SELECT depname, empno, salary, RANK() OVER (PARTITION BY depname ORDER BY salary DESC) FROM empsalary;

@@ -126,6 +126,11 @@ SELECT customer_id FROM orders GROUP BY customer_id HAVING EVERY(delivery_date I
 
 
 
+SELECT a1.client_id,COUNT(DISTINCT a2.client_id) as num_siblings
+FROM client_parents a1
+
+
+
 
 
 

@@ -102,6 +102,12 @@ SELECT ARRAY(SELECT * FROM GENERATE_SERIES(2, 10, 2))
 
 
 
+-- Добавлят в начало массива(array_agg ...) элемент, тут строку (format('*** %s ***', developer_title))
+array_prepend(format('*** %s ***', developer_title), array_agg(attribute order by attribute))
+
+-- Создает строку по шаблону
+format('*** %s ***', developer_title)
+
 
 
 
