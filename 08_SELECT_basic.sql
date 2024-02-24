@@ -131,7 +131,8 @@ SELECT EXTRACT(MONTH FROM payment_date) AS month FROM payment     -- [postgresql
 EXTRACT(DOW FROM created_at)                                      -- dow - день недели 0 for Sunday, 1 for Monday, 6 for Saturday
 TO_CHAR(rental_date, 'dy')                                        -- день недели: Sun, Mon, Sat
 
-current_date - INTERVAL '60 years'                                -- ?? количество лет от даты до сейчас
+cert_finish - CURRENT_DATE                                        -- вычитание дат по умолчанию вернет разницу в днях например 20
+CURRENT_DATE - INTERVAL '60 years'                                -- ?? количество лет от даты до сейчас
 AGE(birthdate)                                                    --> '60 years'   те число лет от даты до сейчас
 AGE(birthdate) >= '60 years'                                      --> true    можно сравнивать
 
@@ -175,6 +176,8 @@ SELECT ROUND(salary)::FLOAT FROM job                     --> [PostgreSQL] окр
 SELECT ROUND(val::NUMERIC, 2)::FLOAT FROM float8         --> [PostgreSQL] округление до 2х знаков необходимо переводить в NUMERIC если есть параметр(2)
 SELECT FLOOR(hours * 0.5) FROM cycling                   --> округление вниз
 SELECT CEIL(yr::FLOAT/100) FROM years                    --> округление вверх
+
+to_char(num, '99.99')                                    -- форматирование числел, тут до 2х знаков с обойх сторон
 
 MOD(number, 2)                                           -- остаток от деления number на 2
 POWER(n, 3)::int                                         -- [PostgreSQL ??] возведение в степень

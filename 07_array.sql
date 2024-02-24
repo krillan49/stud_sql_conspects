@@ -6,6 +6,9 @@
 
 TEXT[], INT[] -- массивы ??
 
+SELECT CARDINALITY(arr) FROM example;              -- длинна массива (работает только с одномерными массивами)
+SELECT array_length(arr, 1) FROM example;          -- длинна массива (хз что за 2й парпметр)
+
 
 
 --                                       Проверка на вхождение в массив
@@ -17,6 +20,8 @@ ARRAY[2,2,7] <@ ARRAY[1,7,4,2,6]                    -- Содержитcя ли 
 
 -- Пример в запросе
 SELECT * FROM film WHERE ARRAY['Trailers', 'Deleted Scenes'] <@ special_features  -- содержится ли 1й массив во втором
+
+-- С массивом работают ALL ANY мб еще что
 SELECT * FROM film WHERE 'Trailers' = ANY(special_features) AND 'Deleted Scenes' != ALL(special_features) -- альтернатива при помощи ANY. Проверяем содержится ли в массиве в данной строке столбца special_features одно значение и не содержится другое
 
 -- LIKE-соответсвие любому выражению в массиве

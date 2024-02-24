@@ -131,6 +131,23 @@ FROM client_parents a1
 
 
 
+-- count в условном операторе
+select
+    s.id as student_id
+  , s.name
+  , case
+      when count(c.id) = 0 then 'quit studying'
+      else concat('failed in ', string_agg(c.course_name || '(' || c.score || ')', ', ' order by c.course_name))
+    end as reason
+from students s
+left outer join courses c on c.student_id = s.id
+where c.student_id is null or c.score < 60
+group by s.id, s.name
+having count(c.id) = 0 or count(c.id) > 2
+order by s.id;
+
+
+
 
 
 
