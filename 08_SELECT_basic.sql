@@ -177,7 +177,10 @@ SELECT ROUND(val::NUMERIC, 2)::FLOAT FROM float8         --> [PostgreSQL] окр
 SELECT FLOOR(hours * 0.5) FROM cycling                   --> округление вниз
 SELECT CEIL(yr::FLOAT/100) FROM years                    --> округление вверх
 
-to_char(num, '99.99')                                    -- форматирование числел, тут до 2х знаков с обойх сторон
+-- https://www.postgresql.org/docs/16/functions-formatting.html
+TO_CHAR(num, '99.99')                                    -- форматирование числел, тут до 2х знаков с обойх сторон
+-- 9 - будет обрезан 0 в начале
+-- 0 - не будет обрезан 0 в начале
 
 MOD(number, 2)                                           -- остаток от деления number на 2
 POWER(n, 3)::int                                         -- [PostgreSQL ??] возведение в степень
@@ -220,6 +223,14 @@ SELECT
 FROM order_status
 -- Тоесть берем части таблицы между строками со значениями 4 в столбце status_code и заполняем их значениями  order_id - MAX(order_id)
 
+
+-- Оконная фунуция sum() over() Выводит суммы в каждой строке: сумму во всех строках(в каждой строке), сумму для каждого customer_id(в каждой строке с эти customer_id) итд
+select sales_id, customer_id, cnt,
+sum(cnt) over () as total,
+sum(cnt) over (order by customer_id) as running_total,
+sum(cnt) over (order by customer_id, sales_id) as running_total_unique
+from sales
+order by customer_id, sales_id;
 
 
 

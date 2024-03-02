@@ -1,4 +1,4 @@
---                                               WITH
+--                                                   WITH
 
 -- WITH (Обобщённое табличное выражение или CTE - Common Table Expressions) - это временный набор данных, к которому можно обращаться в последующих запросах.
 -- Выражение с WITH считается «временным», потому что результат не сохраняется где-либо на постоянной основе - в схеме базы данных
@@ -7,7 +7,7 @@
 
 WITH Aeroflot_trips AS
   (SELECT Trip.* FROM Company JOIN Trip ON Trip.company = Company.id WHERE name = "Aeroflot")
-SELECT plane, COUNT(plane) AS amount FROM Aeroflot_trips GROUP BY plane; -- теперь мы можем использовать временную таблицу Aeroflot_trips созданную в WITH для запроса
+SELECT plane, COUNT(plane) AS amount FROM Aeroflot_trips GROUP BY plane; -- теперь мы можем использовать временную таблицу Aeroflot_trips созданную в WITH
 
 -- С переименованием колонок
 WITH Aeroflot_trips (aeroflot_plane, town_from, town_to) AS
@@ -28,15 +28,8 @@ WITH Aeroflot_trips AS
   (SELECT Trip.* FROM Company INNER JOIN Trip ON Trip.company = Company.id WHERE name = "Don_avia"),
   Aeroflot_Don
   (SELECT * FROM Don_avia_trips UNION SELECT * FROM  Aeroflot_trips)
-SELECT * FROM Aeroflot_Don WHERE id > 10
+SELECT * FROM Aeroflot_Don WHERE id > 10;
 
-
-
-
---  ?? Почемуто нельзя использовать как подзапрос(в постгрэ или везе ??) вот так
-WITH p3 AS
-  (SELECT DISTINCT customer_id FROM orders WHERE product_name = 'Product 3')
-SELECT * FROM orders WHERE orders.customer_id NOT IN p3;
 
 
 
