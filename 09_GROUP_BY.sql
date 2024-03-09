@@ -119,6 +119,9 @@ SELECT home_type, MIN(price) AS min FROM Rooms WHERE price > 30 GROUP BY home_ty
 
 -- используем HAVING с колонкой которую не выводим
 SELECT name, SUM(price) FROM customer GROUP BY name HAVING 'NC-17' != ALL(ARRAY_AGG(f.rating));
+SELECT film_id
+FROM film LEFT JOIN inventory USING(film_id) LEFT JOIN rental USING(inventory_id)
+GROUP BY film_id HAVING SUM(CASE WHEN rental_id IS NULL THEN 1 ELSE 0 END) < 7;
 
 -- EVERY( boolean ) => boolean. [PostgreSQL] тоесть где все сгруппированные значения соответствуют условию (true)
 SELECT customer_id FROM orders GROUP BY customer_id HAVING EVERY(delivery_date IS NULL);

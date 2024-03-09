@@ -133,6 +133,7 @@ TO_CHAR(rental_date, 'dy')                                        -- день н
 
 cert_finish - CURRENT_DATE                                        -- вычитание дат по умолчанию вернет разницу в днях например 20
 CURRENT_DATE - INTERVAL '60 years'                                -- ?? количество лет от даты до сейчас
+'2001-09-28' + interval '1 hour'                                  --> 2001-09-28 01:00:00
 AGE(birthdate)                                                    --> '60 years'   те число лет от даты до сейчас
 AGE(birthdate) >= '60 years'                                      --> true    можно сравнивать
 
@@ -142,6 +143,11 @@ SELECT DATE_TRUNC('hour', timestamp '2020-06-30 17:29:31');                    -
 SELECT DATE_TRUNC('hour', timestamp with time zone '2020-06-30 17:29:31+00')   --> 2020-07-01 03:00:00+10
 SELECT DATE_TRUNC('month', created_at)::DATE AS date FROM posts GROUP BY date  --> реальный пример с переводом в дату в конце и группировкой по дате(2022-10-01)
 DATE_TRUNC('week', CURRENT_DATE - INTERVAL '1 week') -- предыдущая законченная неделя перед этой
+
+order_time > CURRENT_TIMESTAMP - '1 hour' :: INTERVAL
+
+CURRENT_DATE - '2024-02-29 22:11:46 +0000'             --> (postgre)  '8 days 01:48:14'   тип данных INTERVAL
+CURRENT_DATE - occurred_at < '90 days'                 --> true / false
 
 -- DATEDIFF(interval, from, to): interval - дни/месяцы/годы. от даты from до даты to
 SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders         --> тут (day, OrderTime, DeliveryTime) расчет количества дней между OrderTime и DeliveryTime
@@ -162,6 +168,9 @@ SELECT TIMESTAMPDIFF(SECOND, time_out, time_in) AS time FROM Trip               
 -- https://www.postgresql.org/docs/current/functions-formatting.html  Форматирование даты [postgresql]
 TO_CHAR(timestamp, 'FMmonth, YYYY FMDD HH12:MI:SS')            --> 	february, 2023 19 12:00:00
 TO_CHAR(timestamp, 'FMMonth, YYYY FMDD HH12:MI:SS')            --> 	February, 2023 19 12:00:00
+TO_CHAR('2023-05-08 13:00:00 +0000', 'HH12AM:MI')              -->  01PM:00
+TO_CHAR('2023-05-08 13:00:00 +0000', 'HH12:MI AM')             -->  01:00 PM
+
 
 
 --                                            Функции для чисел

@@ -56,9 +56,9 @@ FROM e JOIN rank r ON r.rank_id = e.rank_id AND r.store_id = e.store_id
 
 -- USING вместо ON и сравнения - если столбец по значениям которого объединяем в обоих таблицах называется одинаково ??
 SELECT film_id, title, popularity FROM film
-JOIN film_category USING (film_id)
+JOIN film_category USING(film_id)
 JOIN category ON film_category.category_id = category.category_id AND name = 'Children'
-JOIN inventory USING (film_id)
+JOIN inventory USING(film_id)
 -- AND name = 'Children'  - дополнительная выборка в присоединяемой таблице, удобно для многотабличных джойнов
 
 
