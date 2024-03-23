@@ -147,6 +147,7 @@ DATE_TRUNC('week', CURRENT_DATE - INTERVAL '1 week') -- предыдущая з�
 order_time > CURRENT_TIMESTAMP - '1 hour' :: INTERVAL
 
 CURRENT_DATE - '2024-02-29 22:11:46 +0000'             --> (postgre)  '8 days 01:48:14'   тип данных INTERVAL
+CURRENT_DATE - occurred_at                             --> вернет число дней
 CURRENT_DATE - occurred_at < '90 days'                 --> true / false
 
 -- DATEDIFF(interval, from, to): interval - дни/месяцы/годы. от даты from до даты to
