@@ -87,6 +87,9 @@ GENERATE_SERIES('2023-05-08 10:00:00', '2023-05-08 22:00:00', INTERVAL '30 minut
 SELECT
 GENERATE_SERIES('2023-07-16 08:00:00', '2023-07-16 17:00:00', INTERVAL '1 hour') AS time_from,
 GENERATE_SERIES('2023-07-16 09:00:00', '2023-07-16 18:00:00', INTERVAL '1 hour') AS time_to
+-- колонка всех начал недель 
+SELECT
+GENERATE_SERIES('2024-01-01', '2024-12-31', INTERVAL '1 week') AS time_some
 
 -- используем для размножения строк в зависимости от цифры в quantity_in_stock
 SELECT product_id, product_name, quantity_in_stock, GENERATE_SERIES(1, quantity_in_stock) AS n FROM products
