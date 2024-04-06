@@ -6,8 +6,8 @@
 
 TEXT[], INT[] -- массивы ??
 
-SELECT CARDINALITY(arr) FROM example;              -- длинна массива (работает только с одномерными массивами)
-SELECT array_length(arr, 1) FROM example;          -- длинна массива (хз что за 2й парпметр)
+SELECT CARDINALITY(arr) FROM example;              -- длинна массива (работает корректно только с одномерными массивами, в многомерных считает все элементы последнего уровня как с применение flatten)
+SELECT ARRAY_LENGTH(arr, 1) FROM example;          -- длинна массива, 2й параметр это вложенность те 1 самый внешний массив, 2 - подмассив 1го уровня итд
 
 
 
@@ -34,6 +34,11 @@ SELECT city_name FROM stations WHERE city_name LIKE ANY(ARRAY['A%','E%','I%','O%
 SELECT *, ARRAY(SELECT id FROM some) AS res FROM aaa
 
 
+--                             Создание массива из литералов или значений столбцов строки
+
+SELECT ARRAY[completion, final_review, second_review, first_review, initial_assignment] AS arr FROM some
+
+
 
 --                                         Преобразомание массива в строки
 
@@ -52,7 +57,7 @@ SELECT ARRAY_TO_STRING(arr, ':' , '-') FROM st_information;
 
 
 
---                                       Преобразомание строки в массив
+--                                       Преобразомание строки(литерала) в массив
 
 -- PostgreSQL функция STRING_TO_ARRAY разбивает строку по указанным разделителям в массив
 SELECT STRING_TO_ARRAY('a,b,c', ',') FROM user_tags            --> {a, b, c}
@@ -73,6 +78,12 @@ SELECT pay_by_quarter[3:] FROM sal_emp;                  -- элементы с 
 SELECT pay_by_quarter[2:3] FROM sal_emp;                 -- элементы с 2го по 3й включительно
 SELECT pay_by_quarter[2:3][1:3] FROM sal_emp;            -- элементы с 1го по 3й включительно из подмассивов со 2го по 3й
 SELECT arr[ARRAY_UPPER(arr, 1)];                         -- последний элемент массива arr
+SELECT arr[CARDINALITY(arr)-1];                          -- предпоследний элемент при помощи длинны массива
+
+
+--                                         Удаление элементов из массива
+
+SELECT ARRAY_REMOVE(arr, NULL) AS ar FROM some    -- тут удаляем значения NULL
 
 
 
@@ -87,7 +98,7 @@ GENERATE_SERIES('2023-05-08 10:00:00', '2023-05-08 22:00:00', INTERVAL '30 minut
 SELECT
 GENERATE_SERIES('2023-07-16 08:00:00', '2023-07-16 17:00:00', INTERVAL '1 hour') AS time_from,
 GENERATE_SERIES('2023-07-16 09:00:00', '2023-07-16 18:00:00', INTERVAL '1 hour') AS time_to
--- колонка всех начал недель 
+-- колонка всех начал недель
 SELECT
 GENERATE_SERIES('2024-01-01', '2024-12-31', INTERVAL '1 week') AS time_some
 

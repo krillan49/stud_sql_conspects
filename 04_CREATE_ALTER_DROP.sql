@@ -1,11 +1,11 @@
 --                           Создание, удаление БД и таблиц. Добавление новых колонок.
 
 
-DESCRIBE TableName;   -- посмотреть типы данных столбцов таблицы
-SHOW DATABASES;       -- выведет все БД и таблицы(?) а так же служебные(information_schema, mysql, performance_schema, sys)
+DESCRIBE TableName;   -- (?? в скюлайт не работает ??)посмотреть типы данных столбцов таблицы
+SHOW DATABASES;       -- (?? в скюлайт не работает ??)выведет все БД и таблицы(?) а так же служебные(information_schema, mysql, performance_schema, sys)
 
 
--- операторы определения данных (Data Definition Language, DDL):
+-- Операторы определения данных (Data Definition Language, DDL):
 -- CREATE создаёт объект базы данных (саму базу, таблицу, представление, пользователя и так далее)
 -- ALTER изменяет объект,
 -- DROP удаляет объект;
@@ -16,9 +16,9 @@ SHOW DATABASES;       -- выведет все БД и таблицы(?) а та
 
 -- для имени БД можно использовать буквы, цифры, а также символы "_" и "$". Имя может начинаться с цифр, но не может состоять только из них. Максимальная длина имени составляет 64 знака.
 CREATE DATABASE имя_базы_данных;                -- создание БД
-CREATE DATABASE IF NOT EXIST имя_базы_данных;   -- создание БД если ее не сущкствует
+CREATE DATABASE IF NOT EXIST имя_базы_данных;   -- создание БД только если ее не существует
 DROP DATABASE имя_базы_данных;                  -- удаление БД
-DROP DATABASE IF EXIST имя_базы_данных;         -- удаление БД если она сущкствует
+DROP DATABASE IF EXIST имя_базы_данных;         -- удаление БД только если она существует
 
 
 
@@ -32,7 +32,7 @@ PRIMARY KEY    -- указывает колонку/колоноки как пе
 AUTO_INCREMENT -- значение будет автоматически увеличиваться при добавление новых записей. Максимум одна такая колонка. Можно применять только к int и float.
 UNIQUE         -- значения в данной колонке для всех записей должны быть отличными друг от друга.
 NOT NULL       -- значения в данной колонке должны быть отличными от NULL, тоесть обязательны к заполнению, если будет не заполнено выдаст ошибку
-DEFAULT        -- значение в колонке по умолчанию. Данный параметр не применяется к типам BLOB, TEXT, GEOMETRY и JSON.
+DEFAULT        -- значение в колонке по умолчанию (данный параметр не применяется к типам BLOB, TEXT, GEOMETRY и JSON).
 
 
 -- Варианты создания таблиц:
@@ -48,7 +48,7 @@ CREATE TABLE Users (id INT, name TEXT, age INT, company INT, PRIMARY KEY (id), F
 CREATE TABLE Users (id INT, name TEXT, age INT, company INT, PRIMARY KEY (id), FOREIGN KEY (company) REFERENCES Companies (id), FOREIGN KEY (name) REFERENCES People (id)); -- несколько внешних ключей
 
 
--- Доп опции задаваемые при создании таблиц:
+-- Доп опции (?? для полей с FOREIGN KEY) задаваемые при создании таблиц:
 ON DELETE RESTRICT -- база данных не даст удалить компанию, у которой в таблице Users есть данные(Cannot delete or update a parent row: a foreign key constraint fails)
 ON DELETE CASCADE  -- при удалении компании будут удалены все пользователи, ссылающиеся на эту компанию.
 ON DELETE SET NULL -- база данных запишет NULL в качестве значения поля company для всех пользователей, работавших в удалённой компании.
@@ -79,7 +79,7 @@ DROP INDEX Someidex ON people;          -- удаляем инлекс Someidex 
 
 
 
---                                     Добавление/изменение/удаление колонок
+--                                  Добавление/изменение/удаление колонок(столбцов)
 
 -- ADD - добавить новое поле(столбец) в таблицу
 ALTER TABLE people ADD name VARCHAR(32);                    -- добавляем в таблицу people новый столбец name
@@ -89,6 +89,8 @@ ALTER TABLE people CHANGE name other_name TEXT NOT NULL;    -- изменяем 
 
 -- DROP COLUMN - удалить столбец из таблицы
 ALTER TABLE people DROP COLUMN name;                        -- из таблицы people удаляем столбец name
+
+ALTER TABLE table_name DROP COLUMN column_name1, DROP COLUMN column_name2; -- несколько столбцов
 
 
 
