@@ -85,28 +85,28 @@ CREATE TABLE datetime_table (datetime_field DATETIME);
 SET @@session.time_zone="+00:00"; -- сбрасываем часовой пояс в MYSQL
 INSERT INTO datetime_table VALUES("2022-06-16 16:37:23");
 SET @@session.time_zone="+03:00"; -- меняем часовой пояс в MYSQL
-SELECT * FROM datetime_table;  --=> 2022-06-16 16:37:23
+SELECT * FROM datetime_table;  --> 2022-06-16 16:37:23
 
 -- Пример с TIMESTAMP
 CREATE TABLE timestamp_table (timestamp_field TIMESTAMP);
 SET @@session.time_zone="+00:00"; -- сбрасываем часовой пояс в MYSQL
 INSERT INTO timestamp_table VALUES("2022-06-16 16:37:23");
 SET @@session.time_zone="+03:00"; -- меняем часовой пояс в MYSQL
-SELECT * FROM timestamp_table; --=> 2022-06-16 19:37:23
+SELECT * FROM timestamp_table; --> 2022-06-16 19:37:23
 
 -- Значения DATETIME, DATE и TIMESTAMP могут быть заданы одним из следующих способов:
 -- Как строка в формате YYYY-MM-DD HH:MM:SS или в формате YY-MM-DD HH:MM:SS для указания даты и времени
 -- Как строка в формате YYYY-MM-DD или в формате YY-MM-DD для указания только даты
 -- При указании даты можно использовать любой знак пунктуации в качестве разделительного между частями разделов даты или времени. Также возможно задавать дату вообще без разделительного знака, слитно:
-INSERT INTO date_table VALUES("2022-06-16 16:37:23");  --=> 2022-06-16 16:37:23
-INSERT INTO date_table VALUES("22.05.31 8+15+04");     --=> 2022-05-31 08:15:04
-INSERT INTO date_table VALUES("2014/02/22 16*37*22");  --=> 2014-02-22 16:37:22
-INSERT INTO date_table VALUES("20220616163723");       --=> 2022-06-16 16:37:23
-INSERT INTO date_table VALUES("2021-02-12");           --=> 2021-02-12 00:00:00
+INSERT INTO date_table VALUES("2022-06-16 16:37:23");  --> 2022-06-16 16:37:23
+INSERT INTO date_table VALUES("22.05.31 8+15+04");     --> 2022-05-31 08:15:04
+INSERT INTO date_table VALUES("2014/02/22 16*37*22");  --> 2014-02-22 16:37:22
+INSERT INTO date_table VALUES("20220616163723");       --> 2022-06-16 16:37:23
+INSERT INTO date_table VALUES("2021-02-12");           --> 2021-02-12 00:00:00
 
 
 -- спецификация SQL 92, октябрь 97, стр. 171, раздел 6.16 определяет эти функции(работают с SELECT):
-CURRENT_TIME       -- Время на момент оценки(-3 часа от моссковского)
+CURRENT_TIME       -- Время на момент оценки(-3 часа от московского)
 CURRENT_DATE       -- Дата на момент оценки
 CURRENT_TIMESTAMP  -- Дата и время на момент оценки
 
@@ -115,10 +115,7 @@ datetime() -- Фишка sqlite3(??) когда ставим это значен
 
 
 
---                                                4. Массивы
-
-
-
+--                                                4. Разное
 
 -- ::money  - формат денег в Пострэ
 1281.7::MONEY     -->    '$1,281.70'
