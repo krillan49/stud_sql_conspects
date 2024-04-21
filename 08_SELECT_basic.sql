@@ -95,7 +95,7 @@ SELECT first_name || ' ' || last_name AS full_name FROM rentals -- [postgresql] 
 SELECT SPLIT_PART(chars, ',', 1) AS char FROM monsters          -- [postgresql] разбивает строку chars по ',' и выбирает 1й из разбитых кусков
 SELECT SPLIT_PART(chars, ',', -1) AS char FROM monsters         -- [postgresql] последний элемент (работает только в новых версиях)
 REPLACE('aca', 'a', 'b')                                        --> 'bcb' замена одиночных символов на другие одиночные('a' to 'b')
-FORMAT('Hello, %s how are you doing today?', some)              -- подставит some в позицию %s
+FORMAT('Hello, %s how are you doing today?', some)              -- подставит some в позицию %s (Создает строку по шаблону)
 TRANSLATE(some, '123456789', '000011111')                       -- как tr в Руби
 
 ASCII(char) -- PostgreSQL  получить код символа
@@ -153,7 +153,8 @@ DATE_TRUNC('week', CURRENT_DATE - INTERVAL '1 week') -- предыдущая з�
 
 order_time > CURRENT_TIMESTAMP - '1 hour' :: INTERVAL
 
-CURRENT_DATE - '2024-02-29 22:11:46 +0000'             --> (postgre)  '8 days 01:48:14'   тип данных INTERVAL
+CURRENT_TIMESTAMP - '2024-02-29 22:11:46 +0000'        --> (postgre) '49 days 14:20:38.369185' тип данных INTERVAL
+CURRENT_DATE - '2024-02-29 22:11:46 +0000'             --> '8 days 01:48:14'  CURRENT_DATE - отнимает от начала дня
 CURRENT_DATE - occurred_at                             --> вернет число дней
 CURRENT_DATE - occurred_at < '90 days'                 --> true / false
 
@@ -176,6 +177,7 @@ SELECT TIMESTAMPDIFF(SECOND, time_out, time_in) AS time FROM Trip               
 -- https://www.postgresql.org/docs/current/functions-formatting.html  Форматирование даты [postgresql]
 TO_CHAR(timestamp, 'FMmonth, YYYY FMDD HH12:MI:SS')            --> 	february, 2023 19 12:00:00
 TO_CHAR(timestamp, 'FMMonth, YYYY FMDD HH12:MI:SS')            --> 	February, 2023 19 12:00:00
+'FMDD "days and" FMHH24 "hours ago"'                           --  левый текств в форматирование вставляем в 2йных кавычках
 TO_CHAR('2023-05-08 13:00:00 +0000', 'HH12AM:MI')              -->  01PM:00
 TO_CHAR('2023-05-08 13:00:00 +0000', 'HH12:MI AM')             -->  01:00 PM
 
