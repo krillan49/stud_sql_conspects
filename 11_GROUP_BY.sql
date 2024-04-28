@@ -150,6 +150,29 @@ having count(c.id) = 0 or count(c.id) > 2
 order by s.id;
 
 
+-- ?? Дистинкт до группировки или после хз ??
+SELECT date, count(DISTINCT customer_id) num_new_customers
+FROM customer_purchases GROUP BY date ORDER BY date
+
+
+--                                          ?? FILTER
+
+-- ??
+SELECT
+  order_id,
+  order_id - MAX(order_id) FILTER(WHERE status_code = 4) OVER(ORDER BY order_id) AS sbn
+FROM order_status
+-- Тоесть берем части таблицы между строками со значениями 4 в столбце status_code и заполняем их значениями  order_id - MAX(order_id)
+
+
+-- Оконная фунуция sum() over() Выводит суммы в каждой строке: сумму во всех строках(в каждой строке), сумму для каждого customer_id(в каждой строке с эти customer_id) итд
+select sales_id, customer_id, cnt,
+sum(cnt) over () as total,
+sum(cnt) over (order by customer_id) as running_total,
+sum(cnt) over (order by customer_id, sales_id) as running_total_unique
+from sales
+order by customer_id, sales_id;
+
 
 
 

@@ -61,6 +61,10 @@ JOIN category ON film_category.category_id = category.category_id AND name = 'Ch
 JOIN inventory USING(film_id)
 -- AND name = 'Children'  - дополнительная выборка в присоединяемой таблице, удобно для многотабличных джойнов
 
+-- C 2мя полями в USING
+SELECT COALESCE(ts.product_id, tr.product_id) AS product_id, sale_qty, return_qty, COALESCE(ts.date, tr.date) AS date
+FROM ts FULL OUTER JOIN tr USING(product_id, date)
+
 
 
 --                            Таблицы через запятую вместо INNER JOIN и WHERE вместо ON
@@ -96,12 +100,12 @@ SELECT * FROM left_tab LEFT JOIN right_tab ON left_tab.ключ = right_tab.кл
 -- 1. Формируется таблица на основе внутреннего соединения (INNER JOIN)
 -- 2. В таблицу добавляются значения не вошедшие в результат формирования из левой таблицы (LEFT OUTER JOIN)
 -- 3. В таблицу добавляются значения не вошедшие в результат формирования из правой таблицы (RIGHT OUTER JOIN)
--- Соединение FULL JOIN реализовано не во всех СУБД. Например, в MySQL оно отсутствует
-
-SELECT поля_таблиц FROM левая_таблица FULL OUTER JOIN правая_таблица ON правая_таблица.ключ = левая_таблица.ключ
+-- Соединение FULL JOIN реализовано не во всех СУБД. Например, в MySQL оно отсутствует. В Постгрэ есть.
+SELECT поля_таблиц FROM левая_таблица FULL OUTER JOIN правая_таблица ON правая_таблица.ключ = левая_таблица.ключ;
+SELECT employee_name, department_name FROM employees e FULL OUTER JOIN departments d ON d.department_id = e.department_id;
 
 -- Получение данных, не относящихся к левой и правой таблицам одновременно (обратное INNER JOIN):
-SELECT поля_таблиц FROM левая_таблица FULL OUTER JOIN правая_таблица ON правая_таблица.ключ = левая_таблица.ключ WHERE левая_таблица.ключ IS NULL OR правая_таблица.ключ IS NULL
+SELECT поля_таблиц FROM левая_таблица FULL OUTER JOIN правая_таблица ON правая_таблица.ключ = левая_таблица.ключ WHERE левая_таблица.ключ IS NULL OR правая_таблица.ключ IS NULL;
 
 
 
