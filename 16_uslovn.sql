@@ -91,6 +91,26 @@ SELECT price, IF(price >= 200, "Бизнес", IF(price >= 150, "Комфорт"
 
 
 
+-- CASE внутри CASE
+SELECT items.id,
+       mi.is_by_storage_balance,
+       pbp.portions_by_plan,
+       greatest(floor(min(pbs.portions_possible))::integer, 0),
+       case
+           when ig.meta_item_id IS NULL
+               then 0
+           else
+               case
+                   when mi.is_by_storage_balance = true
+                       then greatest(floor(min(pbs.portions_possible))::integer, 0)
+                   else
+                       pbp.portions_by_plan
+                   end
+           end main_portions,
+       items.meta_item_id
+FROM "items"
+
+
 
 
 
