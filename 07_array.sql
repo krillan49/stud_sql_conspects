@@ -4,9 +4,15 @@
 -- https://postgrespro.ru/docs/postgrespro/9.6/arrays
 -- https://postgrespro.ru/docs/postgrespro/9.6/functions-array
 
-TEXT[], INT[] -- массивы ??
+TEXT[], INT[] -- типы массивов
 
 -- Сортировка массивов есть в разделе груп бай
+
+
+
+--                                    Преобразование типов данных в массивах
+
+SELECT customer_id, arr::INT[] AS arr FROM customer    -- преобразунм значение всех элементов массива в INT
 
 
 
