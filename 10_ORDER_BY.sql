@@ -7,7 +7,6 @@
 -- DESC - порядок сортировки по убыванию
 -- ASC - порядок сортировки по возрастанию(значение по умолчанию)
 
-SELECT name FROM Company ORDER BY name;             -- сортируем строки по значениям столбца name
 SELECT * FROM Orders WHERE sum > 50 ORDER BY timeA; -- отображаем порядок строк по значениям столбца "timeA"
 SELECT * FROM Orders ORDER BY DeliveryTime DESC;    -- с указанием порядка по убыванию
 SELECT * FROM Orders ORDER BY sum DESC, timeA ASC;  -- сортируем по 2м столбцам - при равенстве значений в 1м, сортирует по 2му итд
@@ -15,20 +14,26 @@ SELECT * FROM companies ORDER BY 4;                 -- используем но
 
 
 
--- https://www.geeksforgeeks.org/how-to-custom-sort-in-sql-order-by-clause/  - сортировка с условным операторам CASE
-ORDER BY CASE WHEN sex = 'Male' THEN 1 WHEN sex = 'Female' THEN 2 ELSE 3 END
+--                                          Сортировка по условию CASE
+
+-- Сортировка с условным операторам CASE позволяет заменить для сортировки значения столбцов на более удобные для сортировки в необходимом порядке значения
+SELECT * FROM students ORDER BY CASE WHEN sex = 'Male' THEN 1 WHEN sex = 'Female' THEN 2 ELSE 3 END
+-- тут если сортировать 'Male', 'Female' и 'Trans', то ASC нам даст 'Female', 'Male', 'Trans', DESC соотв наоборот, но нам нужен другой определенный порядок
 
 
--- Сорьтровка по условию
-SELECT * FROM employees WHERE team = 'backend' ORDER BY LEAST(
-  2 * ROW_NUMBER() OVER (ORDER BY birth_date DESC) - 1,
-  2 * ROW_NUMBER() OVER (ORDER BY birth_date)
-)
+
+--                                        Сортировка по ROW_NUMBER()
+
+-- Сортировка по ROW_NUMBER() чтобы не создавать предварительно саму колонку ROW_NUMBER(), если она не нужна
+SELECT id, is_return FROM orders ORDER BY ROW_NUMBER() OVER (PARTITION BY is_return ORDER BY id DESC)
 
 
--- Сортировка по ROW_NUMBER()
-SELECT customer_id, is_return FROM orders
-ORDER BY customer_id, ROW_NUMBER() OVER (PARTITION BY customer_id, is_return), is_return DESC
+-- Сортировка по меньшему значению из 2х ROW_NUMBER()
+SELECT * FROM employees WHERE team = 'backend'
+ORDER BY LEAST(2 * ROW_NUMBER() OVER (ORDER BY birth_date DESC) - 1, 2 * ROW_NUMBER() OVER (ORDER BY birth_date))
+
+
+
 
 
 

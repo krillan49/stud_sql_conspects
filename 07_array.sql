@@ -143,6 +143,13 @@ SELECT product_id, product_name, quantity_in_stock, GENERATE_SERIES(1, quantity_
 SELECT product_id, product_name, quantity_in_stock FROM products CROSS JOIN GENERATE_SERIES(1, quantity_in_stock);
 
 
+-- Вывод из серии еще и совмещенной с таблицей ??
+select year,
+  count(*) filter (where extract(year from joined_date) = year) as joined_quantity,
+  count(*) filter (where extract(year from left_date) = year) as left_quantity
+from generate_series(2014, 2023) AS year, employees
+
+
 
 
 

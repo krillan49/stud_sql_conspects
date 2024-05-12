@@ -47,7 +47,7 @@ SELECT * FROM Rooms WHERE (tv, internet) IN (SELECT tv, internet FROM Rooms WHER
 
 -- Можно использовать другой запрос после FROM вместо имени таблицы
 SELECT class, COUNT(class)
-FROM (SELECT user_id, MAX(class) AS class FROM users GROUP BY user_id) AS subquery
+FROM (SELECT user_id, MAX(class) AS class FROM users GROUP BY user_id) AS subquery -- должен иметь псевдоним
 GROUP BY class
 
 
