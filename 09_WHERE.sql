@@ -68,6 +68,9 @@ SELECT job_id FROM Jobs WHERE progress LIKE '3!%' ESCAPE '!'; -- тут '3%' э�
 -- [ ?? Postgres] SIMILAR TO как LIKE только выбирает любую букву из. Тоесть начинается с любой буквы из данных
 SELECT city_name FROM stations WHERE city_name SIMILAR TO '(A|E|I|O|U)%';
 
+-- Создание строки для like
+like '%,' || $1 || ',%'
+
 
 
 --                                         Полнотекстовый поиск [Postgres]

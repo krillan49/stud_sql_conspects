@@ -17,28 +17,40 @@ SELECT Customers.Id FROM Customers WHERE Customers.id < 5
 
 -- INNER в запросе писать не обязательно тк это значение по умолчанию
 
--- Внутреннее соединение - находятся пары записей из двух таблиц, удовлетворяющие условию соединения, тем самым образуя новую таблицу, содержащую поля из первой и второй исходных таблиц. Например если нашем условии указано равенство значений в полях A.good_id и B.id, то при внутреннем соединении в итоговой выборке окажутся только записи, где в обоих таблицах есть одинаковое значения в good_id и id.
+-- Внутреннее соединение - находятся пары записей из двух таблиц, удовлетворяющие условию соединения, тем самым образуя новую таблицу, содержащую поля из первой и второй исходных таблиц. Например если нашем условии указано равенство значений в полях A.good_id и B.id, то при внутреннем соединении в итоговой выборке окажутся только записи, где эти значения равны
 
 SELECT * FROM Cus INNER JOIN Ord ON Ord.Nid = Cus.id       -- выбираем те строки таблиц Cus и Ord в которых Ord.Nid = Cus.id
 SELECT prod.*, comp.name AS name FROM prod JOIN comp ON prod.comp_id = comp.id  -- выбираем из 1й таблицы все, а из 2й одну колонку
 
--- Можно не писать имена таблиц тк колонки называются по разному (1)
-SELECT member, name FROM Pay JOIN Family ON Pay.id = Family.m_id -- колонка member из таблицы Pay, а колонка name из таблицы Family
+-- Можно не писать имена таблиц для тех имен колонок в запросе, которых не существует в других объединяемых таблицах
+SELECT member, name FROM Pay JOIN Family ON Pay.id = Family.m_id -- member из таблицы Pay, а name из таблицы Family
 
--- INNER JOIN + псевдонимы + WHERE
+-- INNER JOIN + псевдонимы + WHERE(осуществляется после объединения)
 SELECT * FROM Customers C JOIN Orders O ON O.CustId = C.Id WHERE O.Total > 200
 
 -- объединение 3х таблиц
 SELECT Class.name, S_in_c.student, Student.name
 FROM Class JOIN S_in_c ON Class.id = S_in_c.class JOIN Student ON S_in_c.student = Student.id
 
--- INNER JOIN + GROUP BY
-SELECT people.*, COUNT(*) AS count FROM toys JOIN people ON people.id = toys.people_id GROUP BY people.id  -- с функцией для toys
+-- INNER JOIN + GROUP BY. Группировка осуществляется после объединения
+SELECT people.*, COUNT(*) FROM toys JOIN people ON people.id = toys.people_id GROUP BY people.id  -- с функцией для toys
 SELECT Res.room_id, AVG(Rev.rating) AS score FROM Res JOIN Rev ON Res.id = Rev.res_id GROUP BY Res.room_id
 -- выбираем Res.room_id и средние значения Rev.rating для каждого Res.room_id при помощи группировки по Res.room_id из объединенных таблиц Res и Rev
 
 -- Использование псевдонимов чтобы группировать одну таблицу саму с собой
 SELECT managers.id, managers.name FROM employees managers JOIN employees subordinates
+
+
+
+--                                       Объединение не по равенству значений
+
+-- Помимо равенства значений можем объединять и по другим отношениям, напроимер != или < или >
+
+-- объединение по нервыенству значений в колонке, тоесть соединяются значения тех строк таблиц, значения выбранной колонке в которых не равны
+SELECT s1.state AS s_a, s2.state AS s_b, s1.total - s2.total AS dif FROM s1 JOIN s2 ON s1.state != s2.state
+
+-- объединение по <, тоесть соединяются значения тех строк таблиц, значения выбранной колонке одной тавлицы меньше чем в другой
+SELECT s1.state AS s_a, s2.state AS s_b, s2.total - s1.total AS dif FROM s1 JOIN s2 ON s1.state < s2.state
 
 
 
@@ -54,7 +66,7 @@ FROM e JOIN rank r ON r.rank_id = e.rank_id AND r.store_id = e.store_id
 
 --                                                    USING
 
--- USING вместо ON и сравнения - если столбец по значениям которого объединяем в обоих таблицах называется одинаково ??
+-- USING вместо ON и сравнения - используется если столбец по равенству значений которого объединяем в обоих таблицах называется одинаково
 SELECT film_id, title, popularity FROM film
 JOIN film_category USING(film_id)
 JOIN category ON film_category.category_id = category.category_id AND name = 'Children'
@@ -73,8 +85,12 @@ FROM ts FULL OUTER JOIN tr USING(product_id, date)
 SELECT * FROM people, toys
 
 -- (АЛЬТЕРНАТИВА INNER JOIN ON) Перечисление таблиц через запятую вместо INNER JOIN и WHERE вместо ON
-SELECT member, name FROM Pay, Family WHERE Pay.member = Family.member_id           --  тот же запрос что и выше (1)
+SELECT member, name FROM Pay, Family WHERE Pay.member = Family.member_id
 SELECT people.*, toys.toy_count FROM people, toys WHERE people.id = toys.people_id
+
+-- объединение не по равенству значений
+SELECT s1.state AS s_a, s2.state AS s_b, s1.total - s2.total AS dif FROM s1, s2
+WHERE s1.state != s2.state AND s1.total - s2.total < 1000
 
 
 
@@ -90,7 +106,7 @@ SELECT Tim.id, start, Sched.id, class FROM Tim LEFT JOIN Sched ON Sched.num = Ti
 SELECT name, COUNT(Sched.id) AS amount FROM Teacher LEFT JOIN Sched ON Teacher.id = Sched.teacher GROUP BY Teacher.id
 
 -- Получение данных, относящихся только к левой таблице(которые из правой дополнены значениями NULL):
-SELECT * FROM left_tab LEFT JOIN right_tab ON left_tab.ключ = right_tab.ключ WHERE right_tab.ключ IS NULL
+SELECT * FROM left_tab LEFT JOIN right_tab USING(key) WHERE right_tab.key IS NULL
 
 
 -- RIGHT OUTER JOIN (внешнее правое соединение): тоже что и левое только все значения возвращаются из правой, а из левой только соотв условию либо NULL
@@ -100,12 +116,13 @@ SELECT * FROM left_tab LEFT JOIN right_tab ON left_tab.ключ = right_tab.кл
 -- 1. Формируется таблица на основе внутреннего соединения (INNER JOIN)
 -- 2. В таблицу добавляются значения не вошедшие в результат формирования из левой таблицы (LEFT OUTER JOIN)
 -- 3. В таблицу добавляются значения не вошедшие в результат формирования из правой таблицы (RIGHT OUTER JOIN)
--- Соединение FULL JOIN реализовано не во всех СУБД. Например, в MySQL оно отсутствует. В Постгрэ есть.
+-- Соединение FULL JOIN реализовано не во всех СУБД.(Есть: PostgreSQL; Нет: MySQL)
 SELECT поля_таблиц FROM левая_таблица FULL OUTER JOIN правая_таблица ON правая_таблица.ключ = левая_таблица.ключ;
 SELECT employee_name, department_name FROM employees e FULL OUTER JOIN departments d ON d.department_id = e.department_id;
 
 -- Получение данных, не относящихся к левой и правой таблицам одновременно (обратное INNER JOIN):
-SELECT поля_таблиц FROM левая_таблица FULL OUTER JOIN правая_таблица ON правая_таблица.ключ = левая_таблица.ключ WHERE левая_таблица.ключ IS NULL OR правая_таблица.ключ IS NULL;
+SELECT поля_таблиц FROM левая_таблица FULL OUTER JOIN правая_таблица ON правая_таблица.ключ = левая_таблица.ключ
+WHERE левая_таблица.ключ IS NULL OR правая_таблица.ключ IS NULL;
 
 
 
@@ -116,10 +133,10 @@ SELECT поля_таблиц FROM левая_таблица FULL OUTER JOIN пр
 -- Подзапросы с джойнами
 FROM (SELECT * FROM table1) AS alias_name
 
+
 -- LATERALПодзапросы   -   CROSS JOIN LATERAL - вывод новых строк из одной строки
 SELECT s.results FROM strings
 CROSS JOIN LATERAL unnest(string_to_array(string, ' ')) AS s(results)  -- тут results название столбца на выходе а s - хз что (мб s(results) просто имя те скобки не функциональны ??)
-
 
 
 -- NATURAL JOIN

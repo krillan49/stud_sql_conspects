@@ -118,6 +118,7 @@ SELECT SUBSTRING(greeting FROM '#\d+') AS user_id FROM greetings   -- Bienvenido
 SELECT REGEXP_REPLACE('1, 4, и 10 числа', '\d','@','g') FROM dual       --> '@, @, и @@ числа' меняем любую цифру на @ ([postgresql] само меняет только 1й, нужно добавить 'g'; [ORACLE PL/SQL] - само меняет все цифры те флаг 'g' не нужен)
 SELECT REGEXP_REPLACE(str, '[aeiou]', '', 'gi') AS res FROM disemvowel  -- 2 флага для регулярки
 SELECT REGEXP_REPLACE('John Doe', '(.*) (.*)', '\2, \1');               --> 'Doe, John'
+REGEXP_REPLACE(str, ('^' || n || '[aeiou]'), '', 'gi')                  -- с объединением в регулярку значения столбца
 
 -- REGEXP_SPLIT_TO_TABLE(имя_столбца, регулярное_выражение) - сделать новые строки из подстрок строки разбитой по regex
 SELECT REGEXP_SPLIT_TO_TABLE(str, '[aeiou]') AS results FROM random_string  -->  разбиваем строку по гласным(с их удалением) в столбец таблицы
@@ -199,6 +200,8 @@ MOD(num, 2)                                              -- остаток от 
 POWER(n, 3)::INT                                         -- [PostgreSQL ??] возведение в степень
 SQRT(num)                                                -- [PostgreSQL ??] корень квадратный
 GCD(1071, 462)                                           -- 21  Наибольший общий множитель
+
+factorial(n)                                             -- [PostgreSQL] считае факториал от n
 
 -- https://www.postgresql.org/docs/16/functions-formatting.html
 TO_CHAR(num, '99.99')                -- форматирование числел, тут до 2х знаков с обеих сторон (зачемто добавляет пробел вначале)
