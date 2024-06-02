@@ -28,7 +28,7 @@ SELECT name FROM u JOIN r ON u.id = r.o_id WHERE u.id <> ALL (SELECT u_id FROM R
 
 -- IN / NOT IN - проверяет входит ли конкретное значение в набор значений
 SELECT id, name FROM departments WHERE id IN (SELECT department_id FROM sales WHERE price > 98);
-SELECT good_name FROM Goods WHERE good_id NOT IN (SELECT good FROM Payments);                     -- NOT IN
+SELECT good_name FROM Goods WHERE good_id NOT IN (SELECT good_id FROM Payments);                     -- NOT IN
 
 -- ANY - имеет схожие поведение c IN но возвращает TRUE(те работает через операторы сравнения), если хотя бы одно сравнение отдельного значения со значением в наборе вернёт TRUE.
 SELECT * FROM Users WHERE id = ANY (SELECT owner_id FROM Rooms WHERE price >= 150);  -- найдёт пользователей, которые владеют хотя бы 1 жилым помещением стоимостью более 150
@@ -58,7 +58,7 @@ GROUP BY class
 -- Коррелированные подзапросы зависимые(все прошлые 3 варианта были независимы от остального запроса) - он выполняется не один раз перед выполнением запроса, в который он вложен, а для каждой строки, которая может быть включена в окончательный результат. Потому использование коррелированных подзапросов может вызвать проблемы с производительностью, особенно если содержащий запрос возвращает много строк
 
 -- По соотв со значением столбца в каждой новой строке, делаем каждый раз позапрос из другой таблице
-SELECT Family.name, (SELECT MAX(Pay.price) FROM Pay WHERE Pay.member = Family.member_id) AS max_price FROM Family
+SELECT Family.name, (SELECT MAX(Pay.price) FROM Pay WHERE Pay.member_id = Family.member_id) AS max_price FROM Family
 
 
 --                                               EXISTS, EXCEPT
