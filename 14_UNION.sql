@@ -5,9 +5,9 @@
 -- Не путайте операции объединения запросов с операциями объединения таблиц. Для этого служит оператор JOIN.
 -- Чтобы UNION корректно сработал нужно чтобы результирующие таблицы каждого из SQL запросов имели одинаковое число столбцов, с одним и тем же типом данных и в той же самой последовательности.
 
-SELECT DISTINCT good_name AS name FROM Goods
-UNION
-SELECT DISTINCT member_name AS name FROM Family;
+SELECT good_name AS name FROM Goods
+UNION 
+SELECT member_name AS name FROM Family;
 -- в один столбец name попадут и имена членов семьи и названия товаров
 
 SELECT first_name, middle_name, last_name FROM Student

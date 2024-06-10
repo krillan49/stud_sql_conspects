@@ -20,6 +20,13 @@ CREATE DATABASE IF NOT EXIST имя_базы_данных;   -- создание
 DROP DATABASE имя_базы_данных;                  -- удаление БД
 DROP DATABASE IF EXIST имя_базы_данных;         -- удаление БД только если она существует
 
+-- PostgreSQL
+CREATE DATABASE db_name
+  WITH
+  OWNER = postgres
+  ENCODING = 'UTF8'
+  CONNECTION LIMIT = -1;
+
 
 
 --                                               Создание таблиц
