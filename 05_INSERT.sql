@@ -5,7 +5,18 @@
 -- INSERT INTO имя_таблицы (поле_таблицы, ...) VALUES (значение_для_поля_таблицы, ...)
 -- INSERT INTO имя_таблицы (поле_таблицы, ...) SELECT поле_таблицы, ... FROM имя_таблицы ...
 
-INSERT INTO Cars (Id, Name, Price) VALUES (1, 'BMW', 10000)   -- добавляем в столбцы(Id, Name, Price) новую строку со значениями(1, 'BMW', 10000)
+INSERT INTO Cars (Id, Name, Price) VALUES (1, 'BMW', 10000);         -- добавляем в столбцы(Id, Name, Price) новую строку со значениями(1, 'BMW', 10000)
+
+INSERT INTO Cars (Name) VALUES ('Audi');                             -- если добавить строку, содержащую не все столбцы, то в незаполненных столбцах будет значение NULL
+
+INSERT INTO Cars VALUES ('Mersedes', 5000);                          -- можно опустить имена столбццов если заполняем их по порядку
+
+-- добавление нескольких строк в одном запросе
+INSERT INTO users (name, age) VALUES('Алексей', 38), ('Мартин', 12);
+-- добавление нескольких строк в одном запросе без имен столбцов
+INSERT INTO users VALUES
+('Алексей', 38),
+('Мартин', 12);
 
 
 
@@ -29,11 +40,6 @@ INSERT INTO Cars (Name, Price) VALUES ('Audi', 3000)
 
 
 --                                                 Разное
-
-INSERT INTO Cars (Name) VALUES ('Audi')                              -- если добавить строку, содержащую не все столбцы, то в незаполненных столбцах будет значение NULL
-INSERT INTO Cars VALUES ('Mersedes', 5000);                          -- можно опустить имена столбццов если заполняем их по порядку
-INSERT INTO users (name, age) VALUES('Алексей', 38), ('Мартин', 12); -- добавление нескольких строк в одном запросе
-
 
 -- sqlite3(??) Когда ставим значением столбца datetime() то в него помещается текущие дата и время(часовой пояс -3)
 INSERT INTO Posts (content, created_date) VALUES ('Something', datetime());
