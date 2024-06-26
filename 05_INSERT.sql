@@ -22,6 +22,22 @@ INSERT INTO users VALUES
 
 --                                           INSERT и первичный ключ
 
+-- [ PostgreSQL ] Пример добавления нескольких строк с айдишниками(первичный ключ)
+INSERT INTO publisher
+VALUES
+(1, 'Everyman''s Library', 'NY'),
+(2, 'Oxford University Press', 'NY'),
+(3, 'Grand Central Publishing', 'Washington'),
+(4, 'Simon & Schuster', 'Chicago');
+-- Заполняем с внешним ключем к publisher в последнем столбце
+INSERT INTO book
+VALUES
+(1, 'The Diary of a Young Girl', '0199535566', 1),
+(2, 'Pride and Prejudice', '9780307594006', 1),
+(3, 'To Kill a Mockingbird', '0446310786', 2),
+(4, 'The Book of Gutsy Women: Favorite Stories of Courage and Resilience', '1501178415', 2),
+(5, 'War and Peace', '1788886526', 2);
+
 -- Первичный ключ таблицы является уникальным значением и добавление уже существующего значения приведёт к ошибке.
 INSERT INTO Goods SELECT COUNT(*) + 1, 'Table', 2 FROM Goods; -- вариант задания значения ключа способом SELECT
 

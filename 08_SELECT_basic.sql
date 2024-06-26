@@ -134,7 +134,7 @@ REGEXP_COUNT('ABCABCAXYaxy', 'A.', 1, 'i') --> 4
 SELECT YEAR("2022-06-16") AS year;                                --> 2022
 SELECT EXTRACT(MONTH FROM payment_date) AS month FROM payment     -- [postgresql]  Для timestamp without time zone
 EXTRACT(DOW FROM created_at)                                      -- dow - день недели 0 for Sunday, 1 for Monday, 6 for Saturday
-TO_CHAR(rental_date, 'dy')                                        -- день недели: Sun, Mon, Sat
+TO_CHAR(rental_date, 'dy')                                        -- день недели: sun, mon, sat
 
 CURRENT_TIMESTAMP - '2024-02-29 22:11:46 +0000'        --> (postgre) '49 days 14:20:38.369185' тип данных INTERVAL
 CURRENT_DATE - '2024-02-29 22:11:46 +0000'             --> '8 days 01:48:14'  CURRENT_DATE - отнимает от начала дня

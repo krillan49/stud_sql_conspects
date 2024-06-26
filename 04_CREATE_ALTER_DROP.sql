@@ -17,11 +17,12 @@ SHOW DATABASES;       -- (?? в скюлайт не работает ??)выве
 -- для имени БД можно использовать буквы, цифры, а также символы "_" и "$". Имя может начинаться с цифр, но не может состоять только из них. Максимальная длина имени составляет 64 знака.
 
 CREATE DATABASE имя_базы_данных;                -- создание БД (В PostgreSQL так же)
-CREATE DATABASE IF NOT EXIST имя_базы_данных;   -- создание БД только если ее не существует
+CREATE DATABASE IF NOT EXIST имя_базы_данных;   -- создание БД только если ее не существует(! Проверить EXIST ошибка или правильно для МайСКЛ)
+CREATE DATABASE IF NOT EXISTS имя_базы_данных;   -- [PostgreSQL]создание БД только если ее не существует
 
 -- PostgreSQL
 CREATE DATABASE db_name
-  WITH  -- Параметры создания БД. Тут по умолчанию, такие параметры будут заданы автоматически, если все это не писать
+  WITH  -- Параметры создания БД. По умолчанию, такие параметры будут заданы автоматически, если все это не писать
   OWNER = postgres         -- пользователь/владелец
   ENCODING = 'UTF8'        -- кодировка в которой будут символы нашей БД
   LOCALE_PROVIDER = 'libc' -- локаль определяет для разных регионов например формат Флоат(точка или запятая), дат итд
@@ -39,8 +40,9 @@ FROM pg_stat_activity
 WHERE pg_stat_activity.datname = 'имя_бд' AND pid <> pg_backend_pid()
 
 
-DROP DATABASE имя_базы_данных;                  -- удаление БД  (В PostgreSQL так же)
-DROP DATABASE IF EXIST имя_базы_данных;         -- удаление БД только если она существует
+DROP DATABASE имя_базы_данных;                   -- удаление БД  (В PostgreSQL так же)
+DROP DATABASE IF EXISTS имя_базы_данных;         -- удаление БД только если она существует (В PostgreSQL так же)
+DROP DATABASE IF EXIST имя_базы_данных;         -- (! Проверить EXIST ошибка или правильно для МайСКЛ)
 
 
 
@@ -78,11 +80,12 @@ CREATE TABLE public.publisher -- тоесть таблица publisher созд�
   org_name character varying(128) NOT NULL,
   address text NOT NULL,
   CONSTRAINT pk_publisher_id PRIMARY KEY (publisher_id) -- альтернативный синтаксис для задания ограницения(тут PRIMARY KEY) для столбца publisher_id
-  -- CONSTRAINT  - создает имя (тут pk_publisher_id - по соглашениям называется как имя столбца с префиксом pk_ для праймари кей) для ограничения (тут PRIMARY KEY (publisher_id))
+  -- CONSTRAINT  - создает имя (тут pk_publisher_id - по соглашениям называется как имя столбца с префиксом pk_ для праймари кей) для ограничения (PRIMARY KEY в том числе - это ограничение)
 );
 
 
 -- FOREIGN KEY (имя_столбца) REFERENCES Имя_таблицы_с_первичным_ключем (id) - создания таблицы с внешним ключом. REFERENCES - значит ссылка:
+-- FOREIGN KEY задав соответсвующие айди позволяетсвязать 2 таблицы и удобно делать запросы объединяющие данные из них
 CREATE TABLE Users (id INT, name TEXT, age INT, company INT, PRIMARY KEY (id), FOREIGN KEY (company) REFERENCES Companies (id));
 -- внешний ключ company ссылается на первичный ключ id таблицы Companies
 CREATE TABLE Users (id INT, name TEXT, age INT, company INT, PRIMARY KEY (id), FOREIGN KEY (company) REFERENCES Companies (id), FOREIGN KEY (name) REFERENCES People (id)); -- несколько внешних ключей
@@ -96,12 +99,59 @@ ON UPDATE CASCADE  -- если компания изменит свой иден
 
 CREATE TABLE Users (id INT, name VARCHAR(255) NOT NULL, age INT NOT NULL DEFAULT 18, company INT, PRIMARY KEY (id), FOREIGN KEY (company) REFERENCES Companies (id) ON DELETE RESTRICT ON UPDATE CASCADE);
 
+-- [PostgreSQL] создадим таблицу с внешним ключем fk_publisher_id ссылающимся на publisher_id таблицы publisher (один ко многим)
+CREATE TABLE book
+(
+	book_id integer PRIMARY KEY,
+	title text NOT NULL,
+	isbn varchar(32) NOT NULL,
+	fk_publisher_id integer REFERENCES publisher(publisher_id) NOT NULL -- В PostgreSQL тут при создании таблтцы не обязвтельно писать FOREIGN KEY, достаточно REFERENCES
+);
+
+-- [PostgreSQL] создадим таблицу person и с уникальным(отношение 1 к 1) внешним ключем passport
+CREATE TABLE person
+(
+	person_id int PRIMARY KEY,
+	first_name varchar(64) NOT NULL,
+	last_name varchar(64) NOT NULL
+);
+CREATE TABLE passport
+(
+	passport_id int PRIMARY KEY,
+	serial_number int NOT NULL,
+	fk_passport_person int UNIQUE REFERENCES person(person_id) -- внешний ключ уникален тк отношение 1 к 1
+);
+
+-- [PostgreSQL] многие ко многим
+CREATE TABLE book
+(
+	book_id integer PRIMARY KEY,
+	title text NOT NULL,
+	isbn varchar(32) NOT NULL,
+);
+CREATE TABLE author
+(
+	author_id integer PRIMARY KEY,
+	full_name text NOT NULL,
+	rating real
+);
+CREATE TABLE book_author
+(
+	book_id integer REFERENCES book(book_id),
+	author_id integer REFERENCES author(author_id),
+
+  CONSTRAINT book_author_pkey PRIMARY KEY (book_id, author_id) -- создаем так называемый "composite key" первичный ключ по 2м(или более) колонкам, тк только пара ключей уникальна, а каждый в отдельности может повторяться
+);
+-- Далее добавляем значения для каждой из таблиц
+
 
 
 --                                              Удаление таблиц
 
--- DROP TABLE [IF EXIST] имя_таблицы;
-DROP TABLE Tablename;   -- удалить таблицу "Tablename" из данной БД
+DROP TABLE имя_таблицы;   -- удалить таблицу "Tablename" из данной БД (В PostgreSQL так же)
+
+DROP TABLE IF EXISTS имя_таблицы;         -- удаление только если она существует (PostgreSQL)
+DROP TABLE IF EXIST имя_таблицы;         -- (! Проверить EXIST ошибка или правильно для МайСКЛ)
 
 
 
@@ -124,8 +174,18 @@ DROP INDEX Someidex ON people;          -- удаляем инлекс Someidex 
 -- ADD - добавить новое поле(столбец) в таблицу
 ALTER TABLE people ADD name VARCHAR(32);                    -- добавляем в таблицу people новый столбец name
 
+-- [ PostgreSQL ] добавим столбец fk_publisher_id
+ALTER TABLE book
+ADD COLUMN fk_publisher_id INTEGER;
+-- Сделаем этот столбкц внешним ключем к колонке publisher_id таблицы publisher
+ALTER TABLE book
+ADD CONSTRAINT fk_book_publisher  -- тоесть добавляем ограничение по имени fk_book_publisher ...
+FOREIGN KEY(fk_publisher_id) REFERENCES publisher(publisher_id); -- ... которое будет внешним ключем(имя) ссылающимся на колонку publisher_id в таблице publisher
+
+
 -- CHANGE - изменить название, тип данных и доп условие столбца
 ALTER TABLE people CHANGE name other_name TEXT NOT NULL;    -- изменяем имя и тип данных столбца name
+
 
 -- DROP COLUMN - удалить столбец из таблицы
 ALTER TABLE people DROP COLUMN name;                        -- из таблицы people удаляем столбец name
