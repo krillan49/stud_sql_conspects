@@ -24,9 +24,19 @@ SELECT s ~ 'R' AND s ~ '(W|Y)' AND s ~ '[wens].*[wens].*[wens].*[RYW]' AS res FR
 
 -- AS - позволяет использовать псевдонимом таблицы или столбца, чтоб не писать длинное название или просто выбрать новое название. Псевдонимы могут содержать до 255 знаков.
 SELECT 'Строка' AS String                      -- литерал "Строка" в столбце с псевдонимом String
-SELECT member_name AS Name FROM FamilyMembers  -- выводим поле с другим названием при помощи псевдонима
-SELECT member_name Name FROM FamilyMembers     -- AS писать не обязательно, можно просто через пробел
+SELECT member_name AS name FROM FamilyMembers  -- выводим поле с другим названием при помощи псевдонима
+SELECT member_name name FROM FamilyMembers     -- AS писать не обязательно, можно просто через пробел
+
+-- Псевдонимами столбцов не получится пользоваться в WHERE, тк когда оно отрабатывет псевдоним еще не назначен, тк SELECT работает после FROM и WHERE, но можно использовать в GROUP BY(только в случае псевдонимов не сгруппированных столбцов) и ORDER BY тк они работают после SELECT
+SELECT category_id, SUM(units) AS units FROM products GROUP BY category_id ORDER BY units_in_stock;
+-- Соответсвенно не можем использовать в HAVING псевдонимы, которые назначены после группировки
+SELECT category_id, SUM(price * units) AS total_price FROM products
+GROUP BY category_id HAVING SUM(price * units) > 5000
+ORDER BY total_price DESC;
+
+-- Псевдонимы таблиц
 SELECT * FROM Customers C WHERE C.Id < 5       -- псевдоним таблицы, определение после FROM и использование с WHERE
+
 SELECT name AS 'Имя' FROM people               -- [MySQL ?] псевдоним колонки name русским шрифтом
 SELECT Tim.id 'tim.id' FROM Tim                -- [MySQL ?] вариант псевдонимов
 
