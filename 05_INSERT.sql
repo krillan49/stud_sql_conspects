@@ -38,6 +38,10 @@ VALUES
 (4, 'The Book of Gutsy Women: Favorite Stories of Courage and Resilience', '1501178415', 2),
 (5, 'War and Peace', '1788886526', 2);
 
+-- [PostgreSQL] SERIAL, данные для колонки с этим типом можно не прописывать при INSERT, они будут генерироваться автоматически, но тогда нужно прописывать имена колонок
+INSERT INTO chair (chair_name, dean) VALUES ('name', 'dean');
+
+
 -- Первичный ключ таблицы является уникальным значением и добавление уже существующего значения приведёт к ошибке.
 INSERT INTO Goods SELECT COUNT(*) + 1, 'Table', 2 FROM Goods; -- вариант задания значения ключа способом SELECT
 
