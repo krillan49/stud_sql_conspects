@@ -26,7 +26,7 @@ CREATE DATABASE db_name
   OWNER = postgres         -- пользователь/владелец
   ENCODING = 'UTF8'        -- кодировка в которой будут символы нашей БД
   LOCALE_PROVIDER = 'libc' -- локаль определяет для разных регионов например формат Флоат(точка или запятая), дат итд
-  CONNECTION LIMIT = -1;   -- ограничение на колич подключений к БД (-1 значит что ограничений нет)
+  CONNECTION LIMIT = -1    -- ограничение на колич подключений к БД (-1 значит что ограничений нет)
   IS_TEMPLATE = False;
 
 
@@ -228,6 +228,10 @@ DROP CONSTRAINT constraint_name                   -- удалить ограни
 ADD COLUMN price decimal CONSTRAINT CHK_book_price CHECK (price > 0);   -- добавим колонку сразу с констрэйтом
 ALTER COLUMN status SET DEFAULT 'r';           -- добавить значение по умолчанию
 ALTER COLUMN status DROP DEFAULT;              -- убрать значение по умолчанию
+
+-- Добавим первичный ключ в колонку exam_id таблицы exam
+ALTER TABLE exam
+ADD PRIMARY KEY(exam_id);
 
 
 ALTER TABLE student ADD COLUMN rating float;
