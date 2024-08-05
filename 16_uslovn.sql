@@ -1,7 +1,6 @@
 --                                   CASE (условный оператор/условная логика)
 
--- CASE - результат обычно представляет собой значение какогото нового выводимого столбца
-
+-- 1. CASE - результат обычно представляет собой значение какогото нового выводимого столбца
 SELECT
   name,
   CASE             --  несколько условий(если первое не срабатывает переходим ко второму итд)
@@ -35,28 +34,30 @@ SELECT p.name,
 FROM products p JOIN details d ON p.id = d.product_id
 
 
-
---                                          IFNULL (условная функция)
-
--- IFNULL(значение, альтернативное_значение) - возвращает значение, переданное первым аргументом, если оно не равно NULL, иначе возвращает альтернативное_значение
-SELECT IFNULL("SQL Academy", "Альтернатива SQL Academy") AS sql_trainer;     --> "SQL Academy"
-SELECT IFNULL(some, "Альтернатива SQL Academy") AS sql_trainer;
+-- 2. CASE - для выбора столбца для сортировки в зоне ORDER BY
+SELECT contact_name, city, country
+FROM customers
+ORDER BY contact_name, (CASE WHEN city IS NULL THEN country ELSE city END); -- тоесть в зависимости от условий сортировать будем либо по country, либо по city, хз обязательны ли скобки.
 
 
 
 --                                                  COALESCE
 
--- COALESCE - это специальное выражение, которое вычисляет по порядку каждый из своих аргументов и на выходе возвращает значение первого по порядку аргумента, который был не NULL.
+-- COALESCE - это функция, которое вычисляет по порядку каждый из своих аргументов и возвращает значение первого по порядку аргумента, который был не NULL. Вернет NULL, если все аргументы это NULL.
 SELECT COALESCE(NULL, NULL, 1, 2, NULL, 3) FROM some;                      --> 1
 SELECT name, COALESCE(bonus1, bonus2, 1000000) AS bonus FROM table_name    -- если bonus1 == NULL выбирает значение bonus2 если и оно == NULL, тогда выбирает 1000000
 
-SELECT COALESCE(NULLIF(name, ''), '[product name not found]') AS name FROM eusales  -- при помощи NULLIF меняем пустые строки на NULL чтобы применить COALESCE
+-- COALESCE - предполагает принятие во все аргументы данные одного и того же типа(или NULL), тк помещает их в одну колонку, поэтому может потребоваться применить преобразование типов
+SELECT COALESCE(order_id::text, 'no orders') FROM customers;
+
+-- Замена других значений в комбинации с NULLIF
+SELECT COALESCE(NULLIF(name, ''), '[product name not found]') AS name FROM eusales  -- при помощи NULLIF, проверяем пустая ли строка и меняем пустые строки на NULL, чтобы применить COALESCE
 
 
 
---                                          NULLIF (условная функция) (работает в PostgreSQL)
+--                                          NULLIF (условная функция)
 
--- NULLIF(значение_1, значение_2) - возвращает NULL, если значение_1 равно значению_2, в противном случае возвращает значение_1(тоесть колонку для проверки ставим в 1)
+-- NULLIF(значение_1, значение_2) - возвращает NULL, если значение_1 равно значению_2, если они не равны то возвращает значение_1(тоесть колонку для проверки ставим в 1).
 SELECT NULLIF("SQL Academy", "SQL Academy") AS sql_trainer;                 --> <NULL>
 SELECT NULLIF("SQL Academy", "Альтернатива SQL Academy") AS sql_trainer;    --> "SQL Academy"
 
@@ -76,7 +77,15 @@ SELECT id, n % x = 0 AND n % y = 0 AS res FROM kata
 
 
 
---                                     IF (условная функция/условная логика) (нет в PostgreSQL, есть в MySQL)
+--                                          [MySQL ??] IFNULL (условная функция)
+
+-- IFNULL(значение, альтернативное_значение) - возвращает значение, переданное первым аргументом, если оно не равно NULL, иначе возвращает альтернативное_значение
+SELECT IFNULL("SQL Academy", "Альтернатива SQL Academy") AS sql_trainer;     --> "SQL Academy"
+SELECT IFNULL(some, "Альтернатива SQL Academy") AS sql_trainer;
+
+
+
+--                                    [MySQL] IF (условная функция/условная логика)
 
 -- IF (условное_выражение, значение_1, значение_2). Если условное выражение в первом аргументе в функции IF, истинно, функция вернёт значение второго аргумента значение_1, иначе возвращается значение третьего аргумента значение_2.
 

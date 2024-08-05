@@ -173,6 +173,8 @@ DATE_TRUNC('week', CURRENT_DATE - INTERVAL '1 week')                         -- 
 -- DATEDIFF(interval, from, to): interval - дни/месяцы/годы. от даты from до даты to
 SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders         --> тут (day, OrderTime, DeliveryTime) расчет количества дней между OrderTime и DeliveryTime
 
+DATE_PART('year', last)   -- извлекает год из даты в колонке last в виде числа
+
 -- Аналог DATEDIFF для PostgreSQL
 -- даты без времени отнимаются по умолчанию в днях без DATEDIFF/DATE_PART
 DATE_PART('year', last) - DATE_PART('year', first)                       -- Years   == DATEDIFF(yy, first, last)
