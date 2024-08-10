@@ -216,6 +216,8 @@ POWER(n, 3)::INT                                         -- [PostgreSQL ??] во
 SQRT(num)                                                -- [PostgreSQL ??] корень квадратный
 GCD(1071, 462)                                           -- 21  Наибольший общий множитель
 
+random() -- [PostgreSQL ??] генерит флоат от 0 до 1
+
 factorial(n)                                             -- [PostgreSQL] считае факториал от n
 
 -- https://www.postgresql.org/docs/16/functions-formatting.html

@@ -55,6 +55,13 @@ SELECT fix_customer_region();
 
 
 -- Если функция не объявлена ​​возвращающей void, последний оператор должен быть SELECT или INSERT, UPDATE или DELETE с предложением RETURNING.
+CREATE OR REPLACE FUNCTION fix_customer_region() RETURNS TABLE(..какието столбцы соотв возвращенному...) void AS $$
+	UPDATE tmp_customers
+  SET region = 'unknown'
+  WHERE region IS NULL
+	RETURNING *; -- возврвщаем измененную таблицу
+$$ LANGUAGE sql;
+SELECT * FROM fix_customer_region();
 
 
 
@@ -101,6 +108,8 @@ SELECT get_max_price_from_discontinued() AS max_price
 
 -- DEFAULT - присваивает аргументу значение по умолчанию (на случай если аргумент не передан), прописываем после имени аргумента и типа данных
 DEFAULT value;
+
+-- типы данных должны быть как в таблице или совместимые с ними ??
 
 
 -- Например функция, что вернет цену продукта по его имени

@@ -186,6 +186,9 @@ CREATE TABLE public.book
 	CONSTRAINT CHK_book_price CHECK (price > 0) -- тоесть колонку price можно заполнить только значениями больше 0, можно задать любые логические условия, в том числе составные
 );
 
+-- Создаем новую таблицу от запроса
+CREATE TABLE new_some AS SELECT * FROM some;
+
 
 
 --                                            DROP TABLE Удаление таблиц
