@@ -1,6 +1,6 @@
 --                                           Функции pl/pgSQL
 
--- pl/pgSQL - язык процедурных расширений, для написания императивного кода:
+-- pl/pgSQL - язык процедурных расширений, для написания императивного кода, например может:
 -- Создавать переменные в теле функции
 -- Использовать циклы и условную логику
 -- Выбрасывать исключения
@@ -17,21 +17,22 @@ $$ LANGUAGE plpgsql;
 
 --                                           Возврат и присвоение
 
--- Возврат скалярного значения из тела функции через RETURN вместо SELECT, а возврат множественных значений через RETURN QUERY в дополнение к SELECT
+-- Возврат скалярного значения производиттся из тела функции через RETURN вместо SELECT. RETURN не обязателен если используем OUT-параметры
+-- Возврат множественных значений поизводится через RETURN QUERY в дополнение к SELECT
 
 
--- Пример скалярной функции, которая возвращает число:
+-- Скалярная функцияи на plpgsql, которая возвращает число:
 CREATE OR REPLACE FUNCTION get_total_number_of_goods() RETURNS bigint AS $$
 BEGIN
   -- RETURN возвращает к оператору скалярное значение от запроса:
-	RETURN sum(units_in_stock) FROM products WHERE discontinued = 1; -- нужна точка с запятой в конце
+	RETURN SUM(units_in_stock) FROM products WHERE discontinued = 1; -- нужна точка с запятой в конце
 END;
 $$ LANGUAGE plpgsql;
 -- Оператор такой же
 SELECT get_total_number_of_goods();
 
 
--- Пример функции с OUT-параметрами и присвоение значений в переменные:
+-- Функция с OUT-параметрами и присвоением значений в их переменные:
 CREATE OR REPLACE FUNCTION get_price_boundaries(OUT max_price real, OUT min_price real) AS $$
 BEGIN
   -- Вариант 1: присвоим значения в переменные(OUT-параметры) по отдельности, при помощи ':=' или просто '=' (алиасы). Так на каждое присвоение будет выполнен отдельный запрос к БД
@@ -44,11 +45,10 @@ BEGIN
 	-- RETURN не обязателен если используем OUT-параметры
 END;
 $$ LANGUAGE plpgsql;
--- Оператор работает стандартно
 SELECT * FROM get_price_boundaries();
 
 
--- Пример с математической операцией над входящими переменными, чисто математическая задача вообще не связанная с таблицами
+-- Функция с математической операцией над входящими переменными, чисто математическая задача вообще не связанная с таблицами
 CREATE OR REPLACE FUNCTION get_sum(x int, y int, OUT result int) AS $$
 BEGIN
 	result = x + y; -- тоесть выходящая переменная будет принимать значение суммы входящих
@@ -56,18 +56,15 @@ BEGIN
   -- еще какаято логика, которая уже не будет исполнена
 END;
 $$ LANGUAGE plpgsql;
--- Оператор работает стандартно
 SELECT * FROM get_sum(2, 3);
 
 
 -- RETURN QUERY. Вернем колонку записей при помощи RETURNS SETOF
 CREATE FUNCTION get_customers_by_country(customer_country varchar) RETURNS SETOF customers AS $$
 BEGIN
-	RETURN QUERY
-	SELECT * FROM customers WHERE country = customer_country;
+	RETURN QUERY SELECT * FROM customers WHERE country = customer_country;
 END;
 $$ LANGUAGE plpgsql;
--- Оператор работает стандартно
 SELECT * FROM get_customers_by_country('USA');
 
 
@@ -87,19 +84,19 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- Пример функции с декларацией переменной
+-- Функция с декларацией переменной
 CREATE OR REPLACE FUNCTION get_square(ab real, bc real, ac real) RETURNS real AS $$
 DECLARE
 	perimeter real;
 BEGIN
 	perimeter:=(ab+bc+ac)/2;
-	RETURN sqrt(perimeter * (perimeter - ab) * (perimeter - bc) * (perimeter - ac)); -- тут считаем с применением встроенной функции
+	RETURN SQRT(perimeter * (perimeter - ab) * (perimeter - bc) * (perimeter - ac)); -- тут считаем с применением встроенной функции
 END;
 $$ LANGUAGE plpgsql;
 SELECT get_square(6, 6, 6);
 
 
--- Пример с вычислением средней цены по продуктам из таблицы и от нее расчета вехней и нижней границы цен
+-- Функция с вычислением средней цены по продуктам из таблицы и от нее расчета вехней и нижней границы цен
 CREATE OR REPLACE FUNCTION middle_priced() RETURNS SETOF products AS $$
 	DECLARE
 		average_price real;
@@ -107,7 +104,7 @@ CREATE OR REPLACE FUNCTION middle_priced() RETURNS SETOF products AS $$
 		top_price real;
 	BEGIN
 		SELECT AVG(unit_price) INTO average_price FROM products; -- присваиваем значение запроса в новую переменную average_price
-		bottom_price := average_price * .75; -- используем новые переменные, присваимваем в них значения границ цен
+		bottom_price := average_price * .75;  -- используем новые переменные, присваимваем в них значения границ цен
 		top_price := average_price * 1.25;
 		RETURN QUERY SELECT * FROM products WHERE unit_price BETWEEN bottom_price AND top_price; -- возвращаем строки соответсвующие границам цен из переменных
 	END;
@@ -130,8 +127,8 @@ ELSE
 END IF;
 
 
--- Функция с IF-THEN-ELSE переводящая цельсии в фаренгейты или наоборот
-CREATE OR REPLACE FUNCTION convert_temp_to(temperature real, to_celsius bool DEFAULT true) returns real AS $$
+-- Скаляреная функция с IF-THEN-ELSE переводящая цельсии в фаренгейты или наоборот
+CREATE OR REPLACE FUNCTION convert_temp_to(temperature real, to_celsius bool DEFAULT true) RETURNS real AS $$
 DECLARE
 	result_temp real;
 BEGIN
@@ -149,7 +146,7 @@ SELECT convert_temp_to(26.7, false);
 
 
 -- Функция с множественным ветвлением IF-ELSIF-ELSE возвращает сезон в зависимости от номера месяца
-CREATE OR REPLACE FUNCTION get_season(month_number int) returns text AS $$
+CREATE OR REPLACE FUNCTION get_season(month_number int) RETURNS text AS $$
 DECLARE
 	season text;
 BEGIN
@@ -171,7 +168,7 @@ SELECT get_season(12);
 
 --                                            Циклы в plpgsql. Синтаксис
 
--- WHILE цикл. После ключевого слова WHILE с условием идет блок кода, обернутый в LOOP...END LOOP, который повторяется необходимое число раз, прока expression является TRUE:
+-- WHILE цикл. После ключевого слова WHILE с условием идет блок кода, обернутый в LOOP...END LOOP, который повторяется необходимое число раз, пока expression является TRUE:
 WHILE expression
 LOOP
 	-- логика
@@ -183,12 +180,15 @@ LOOP
 	-- логика
 END LOOP;
 
--- FOR цикл. Вместо a и b можно подставить числовые литералы, так в качестве необязательно аргумента можем указать при помощи BY числовой литерал для шага, который по умолчанию равен 1
--- REVERSE реверсирует цикл в обратном порядке, нужно чтобы a было больше b, а значение n по умолчанию станет отрицательным
+-- FOR цикл. Вместо a и b можно подставить числовые литералы
+-- BY      - задает числовой литерал для шага, который по умолчанию равен 1
+-- REVERSE - реверсирует цикл в обратном порядке, нужно чтобы a было больше b, а значение n по умолчанию станет отрицательным
 FOR counter IN [REVERSE] a..b [BY n]
 LOOP
 	-- логика
 END LOOP;
+
+-- ?? FOREACH
 
 -- CONTINUE - прерывает исполнение локиги и переходит к следующей итерации
 CONTINUE [WHEN expression]
@@ -200,7 +200,7 @@ EXIT [WHEN expression]
 
 --                                             Примеры циклов
 
--- Пример цикла WHILE для функции вычисления энного числа Фибоначи
+-- WHILE.  Функция вычисления энного числа Фибоначи
 CREATE OR REPLACE FUNCTION fibonacci(n INTEGER) RETURNS INTEGER AS $$
 DECLARE
   counter INTEGER := 0;
@@ -220,7 +220,7 @@ END;
 SELECT fibonacci(3);
 
 
--- Пример цикла LOOP c EXIT WHEN для той же функции вычисления энного числа Фибоначи
+-- LOOP c EXIT WHEN.  Функция вычисления энного числа Фибоначи
 CREATE OR REPLACE FUNCTION fibonacci (n INTEGER) RETURNS INTEGER AS $$
 DECLARE
   counter INTEGER := 0;
@@ -241,21 +241,21 @@ $$ LANGUAGE plpgsql;
 SELECT fibonacci(3);
 
 
--- Пример цикла FOR IN для анонимного блока кода
+-- FOR IN.  Для анонимноых блоков кода
 DO $$
 BEGIN
   FOR counter IN 1..5 LOOP
   	RAISE NOTICE 'Counter: %', counter; -- выведем сообщение "Counter: n" в месенджер
   END LOOP;
 END; $$
--- Пример цикла FOR IN с REVERSE
+-- FOR IN с REVERSE
 DO $$
 BEGIN
   FOR counter IN REVERSE 5..1 LOOP
     RAISE NOTICE 'Counter: %', counter;
   END LOOP;
 END; $$
--- Пример цикла FOR IN с BY
+-- FOR IN с BY
 DO $$
 BEGIN
   FOR counter IN 1..6 BY 2 LOOP
@@ -264,33 +264,7 @@ BEGIN
 END; $$
 
 
--- Пример с итерацией массива при помощи цикла FOR
-CREATE OR REPLACE FUNCTION filter_even(variadic numbers int[]) RETURNS SETOF int AS $$
-BEGIN
-  FOR counter IN 1..array_upper(numbers, 1) LOOP
-		CONTINUE WHEN counter % 2 != 0;
-		RETURN NEXT counter;
-  END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-SELECT * FROM filter_even(1, 2, 3, 4, 5, 6);
-
-
---*FOREACH*--
-CREATE OR REPLACE FUNCTION filter_even(variadic numbers int[]) RETURNS SETOF int AS $$
-DECLARE
-	counter int;
-BEGIN
-  FOREACH counter IN ARRAY numbers LOOP
-   	CONTINUE WHEN counter % 2 != 0;
-   	return next counter;
-  END LOOP;
-END;
-$$ LANGUAGE plpgsql;
-SELECT * FROM filter_even(1, 2, 3, 4, 5, 6);
-
-
--- Iterate Over a Query --
+-- FOR IN. Для итерации запроса
 CREATE OR REPLACE FUNCTION iter_over_query(n INTEGER DEFAULT 5) RETURNS VOID AS $$
 DECLARE
   rec RECORD;
@@ -330,26 +304,13 @@ $$ LANGUAGE plpgsql;
 SELECT * FROM return_setof_int() -- выведет столбец со значениями 1, 2, 3
 
 
--- ???
-CREATE OR REPLACE FUNCTION test0() RETURNS TABLE(y integer, result text) AS $$
-BEGIN
-  FOR y, result IN
-    SELECT s.y, 'hi' result FROM generate_series(1,10,1) AS s(y)
-  LOOP
-    RETURN NEXT y;
-  END LOOP;
-END
-$$ LANGUAGE plpgsql;
-SELECT * FROM test0();
-
-
 -- Пример функции, что проходит по таблице продуктов и меняет их цену в зависимости от категории. Но так лучше не писать в реальности, тк даже если заменить это на 3 селекта с UNION, то будет скорее всего работать быстрее
 CREATE OR REPLACE FUNCTION after_christmas_sale() RETURNS SETOF products AS $$
 DECLARE
-	product record; -- тип record, это некая запись ??
+	product record; -- тип record, это некая запись ?? нужен чтобы хранить набор данных ??
 BEGIN
 	FOR product IN
-		SELECT * FROM products -- тоесть на кадлой итерации в переменную product попадает текущая запись/строка из результирующего набора данного SELECT-запроса
+		SELECT * FROM products -- тоесть на каждой итерации в переменную product попадает текущая запись/строка из результирующего набора данного SELECT-запроса
 	LOOP
 		IF product.category_id IN (1,4,8) THEN
 			product.unit_price = product.unit_price * .80; -- модифицируем значение unit_price, у текущей записи из переменной product
@@ -364,6 +325,35 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 SELECT * FROM after_christmas_sale(); -- выведет запрос аналогичный изначальной таблице но с модифицированными ценами
+
+
+
+--                                              Итерация массива
+
+-- FOR для итерациеи массива
+CREATE OR REPLACE FUNCTION filter_even(variadic numbers int[]) RETURNS SETOF int AS $$
+BEGIN
+  FOR counter IN 1..array_upper(numbers, 1) LOOP
+		CONTINUE WHEN counter % 2 != 0;
+		RETURN NEXT counter;
+  END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+SELECT * FROM filter_even(1, 2, 3, 4, 5, 6);
+
+
+-- ?? FOREACH для итерации массива
+CREATE OR REPLACE FUNCTION filter_even(variadic numbers int[]) RETURNS SETOF int AS $$
+DECLARE
+	counter int;
+BEGIN
+  FOREACH counter IN ARRAY numbers LOOP
+   	CONTINUE WHEN counter % 2 != 0;
+   	RETURN NEXT counter;
+  END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+SELECT * FROM filter_even(1, 2, 3, 4, 5, 6);
 
 
 
