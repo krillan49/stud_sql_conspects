@@ -137,6 +137,7 @@ REGEXP_REPLACE(str, ('^' || n || '[aeiou]'), '', 'gi')                  -- с о
 SELECT REGEXP_SPLIT_TO_TABLE(str, '[aeiou]') AS results FROM random_string  -->  разбиваем строку по гласным(с их удалением) в столбец таблицы
 
 -- REGEXP_COUNT(строка, шаблон [, start [, flags]]) — системная функция, подсчитывает количество мест, где шаблон регулярного выражения POSIX соответствует строке. start - считает начиная с этого индекса
+-- Работает только с 15й версии Постгрэ
 REGEXP_COUNT('ABCABCAXYaxy', 'A.')         --> 3
 REGEXP_COUNT('ABCABCAXYaxy', 'A.', 1, 'i') --> 4
 
@@ -174,6 +175,7 @@ DATE_TRUNC('week', CURRENT_DATE - INTERVAL '1 week')                         -- 
 SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders         --> тут (day, OrderTime, DeliveryTime) расчет количества дней между OrderTime и DeliveryTime
 
 DATE_PART('year', last)   -- извлекает год из даты в колонке last в виде числа
+date_part('year', AGE(age));  -- возвращает число полных лет от даты до сейчас
 
 -- Аналог DATEDIFF для PostgreSQL
 -- даты без времени отнимаются по умолчанию в днях без DATEDIFF/DATE_PART

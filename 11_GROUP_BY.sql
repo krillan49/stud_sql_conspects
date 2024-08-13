@@ -159,6 +159,16 @@ SELECT order_id, MAX(order_id) FILTER(WHERE status_code = 4) OVER(ORDER BY order
 
 
 
+-- Можно использовать просто значения в агрегатных функциях
+SELECT failure_reason, SUM(1) AS cnt FROM interview_failures
+GROUP BY failure_reason
+
+
+
+
+
+
+
 
 
 
