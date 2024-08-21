@@ -129,7 +129,7 @@ SELECT ARRAY(SELECT * FROM GENERATE_SERIES(2, 10, 2))
 -- удобно использовать как изначальные данные, тут чтоб создать таблицу с одинаковыми значениями в 2х столбцах из 10 строк
 SELECT 0, '-' FROM GENERATE_SERIES(1, 10)
 SELECT REPEAT('*', 20-n) AS star_pattern FROM GENERATE_SERIES(1, 10) AS n
-select n, factorial(n) as res from generate_series(1, 5) as t(n)
+SELECT n, factorial(n) AS res FROM generate_series(1, 5) AS t(n)
 
 -- Функция применяется к каждому сгенереному члену
 SELECT POWER((GENERATE_SERIES(1, n)), 3) AS m FROM some

@@ -85,6 +85,16 @@ FROM Goods;
 
 
 
+-- Вставка многих строк из запроса. В этом примере в таблицу films вставляются некоторые строки из таблицы tmp_films с той же компоновкой столбцов, что и у films:
+INSERT INTO films SELECT * FROM tmp_films WHERE date_prod < '2004-05-07';
+
+
+-- Вставка с использованием подзапроса
+CREATE TABLE dishes (restaurant_id INT, dish TEXT);
+WITH d AS (SELECT id, UNNEST(STRING_TO_ARRAY(menu, ',')) AS dd FROM restaurants)
+INSERT INTO dishes SELECT id, dd FROM d;
+
+
 
 
 

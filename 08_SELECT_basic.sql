@@ -254,6 +254,11 @@ SELECT depname, empno, salary, RANK() OVER (PARTITION BY depname ORDER BY salary
 SELECT *, (ROW_NUMBER() OVER(ORDER BY birth_date DESC)) * 2 - 1 AS rank FROM employees
 
 
+-- Хз как это работает. Мб LAG это именение последовательности, например сперва возрастала потом убывает и отсюда ранг опять с 1 ??
+LAG(price) OVER (ORDER BY trade_date) prev_price
+lag(price, 1, price - 1) over (order by trade_date) as drop
+
+
 
 
 

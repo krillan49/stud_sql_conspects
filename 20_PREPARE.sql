@@ -31,6 +31,14 @@ PREPARE usrrptplan (INT) AS  -- тк тут тип данных 2го парам
   SELECT * FROM users u, logs l WHERE u.usrid = $1 AND u.usrid = l.usrid AND l.date = $2;
 EXECUTE usrrptplan(1, current_date); -- выполняем подготовленный оператор
 
+-- Вариант подготовленного оперетора для более стожного SELECT-запроса:
+PREPARE find_groups_with_matching_employees(text) AS
+  WITH
+  r AS (SELECT group_name, ARRAY_AGG(employee_id ORDER BY employee_id) AS employees FROM groups GROUP BY group_name),
+  a AS (SELECT employees FROM r WHERE group_name = $1)
+  SELECT * FROM r WHERE group_name != $1 AND employees = (SELECT employees FROM a);
+EXECUTE find_groups_with_matching_employees('a1');
+
 
 
 
