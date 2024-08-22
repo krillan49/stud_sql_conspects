@@ -38,6 +38,17 @@ ORDER BY LEAST(2 * ROW_NUMBER() OVER (ORDER BY birth_date DESC) - 1, 2 * ROW_NUM
 
 
 
+-- Сортировка по рандомному полю?
+SELECT id, fg, yu
+FROM s
+ORDER BY RANDOM();
+
+
+
+
+
+
+
 
 
 
