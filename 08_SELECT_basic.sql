@@ -230,6 +230,8 @@ TO_CHAR('2023-05-08 13:00:00 +0000', 'HH12:MI AM')             -->  01:00 PM
 -- Можем использовать математические операторы к значениям из таблицы и дополнительным литералам
 SELECT a + b - 5, a * c / 2, a ^ 2 % 3 FROM some -- ^ только в postgresql ??
 
+SELECT 10000!                                    -- Факториал [postgresql ??]
+
 SELECT LEAST(compasses, gears, tablets) AS small FROM some   -- [postgresql ??] выбирает наименьшее из значений
 SELECT GREATEST(1, 2, 3)                                     -- [postgresql ??] выбирает наибольшее из значений(тут 3)
 

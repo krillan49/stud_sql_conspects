@@ -219,6 +219,25 @@ BEGIN
 END;
 SELECT fibonacci(3);
 
+-- Считаем число будней между датами включительно
+CREATE OR REPLACE FUNCTION weekdays(d1 DATE, d2 DATE) RETURNS INTEGER AS $$
+DECLARE
+  res INTEGER = 0;
+BEGIN
+  IF d1 > d2 THEN
+    SELECT d1, d2 INTO d2, d1;
+	END IF;
+  WHILE d1 <= d2
+  LOOP
+    IF EXTRACT(DOW FROM d1) BETWEEN 1 AND 5 THEN
+      res = res + 1;
+    END IF;
+    d1 = d1 + INTERVAL '1 day';
+  END LOOP;
+  RETURN res;
+END;
+$$ LANGUAGE plpgsql;
+
 
 -- LOOP c EXIT WHEN.  Функция вычисления энного числа Фибоначи
 CREATE OR REPLACE FUNCTION fibonacci (n INTEGER) RETURNS INTEGER AS $$
