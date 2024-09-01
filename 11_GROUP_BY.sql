@@ -102,6 +102,10 @@ SELECT name, BOOL_OR(price > 200) AS has_rich FROM customer GROUP BY name
 SELECT customer_id, EVERY(delivery_date IS NULL) FROM orders GROUP BY customer_id;  -- Тоесть где все группируемые значения в группе соответвуют условию возвращает TRUE иначк FALSE
 
 
+-- Можно использовать просто значения в агрегатных функциях
+SELECT failure_reason, SUM(1) AS cnt FROM interview_failures GROUP BY failure_reason
+
+
 -- Функция от вычислений
 SELECT name, SUM(count * (handedness = 'Right-handed')::INT) AS "Right-handed" FROM customer GROUP BY name
 -- Тоесть TRUE::INT это 1, соотв FALSE::INT это 0. В итоге получаем всегда 0 если значения не 'Right-handed'
@@ -148,6 +152,23 @@ ORDER BY customer_id, sales_id;
 
 
 
+--                                  FILTER. Фильтрация в агрегатных функциях
+
+-- FILTER - задает ограничение для значений, которые будут обрабатываться агрегатной функцией
+
+SELECT
+  rating,
+  COUNT(*),                            -- так посчтитает общее число фиьмов
+  COUNT(*) FILTER(WHERE length > 100), -- а так в том же запросе посчитаем колличество фильмов определенной продолжительности. А иначе с обычным условием WHERE после FROM пришлось бы делать 2 отдельных запроса
+  COUNT(*) FILTER(WHERE length > 120)
+FROM films GROUP BY rating;
+
+-- ?? OVER + FILTER
+SELECT order_id, MAX(order_id) FILTER(WHERE status_code = 4) OVER(ORDER BY order_id) AS sbn FROM order_status
+-- Тоесть берем части таблицы между строками со значениями 4 в столбце status_code и заполняем их значениями MAX(order_id)
+
+
+
 --                                                  HAVING
 
 -- HAVING (наличие): фильтрует группы по условию. Чемто похоже на WHERE, но нужен для того чтоб фильтровать после группировки и  агрегирования(суммы, подсчет итд) с GROUP BY. Тоесть накладывает условия на результаты агрегатных функций
@@ -167,22 +188,6 @@ SELECT f_id FROM film LEFT JOIN inventory USING(f_id) LEFT JOIN rental USING(i_i
 GROUP BY f_id HAVING SUM(CASE WHEN r_id IS NULL THEN 1 ELSE 0 END) < 7;
 
 
-
---                                          FILTER(WHERE ...)
-
--- ??
-SELECT order_id, MAX(order_id) FILTER(WHERE status_code = 4) OVER(ORDER BY order_id) AS sbn FROM order_status
--- Тоесть берем части таблицы между строками со значениями 4 в столбце status_code и заполняем их значениями MAX(order_id)
-
-
-
-
-
-
-
--- Можно использовать просто значения в агрегатных функциях
-SELECT failure_reason, SUM(1) AS cnt FROM interview_failures
-GROUP BY failure_reason
 
 
 
