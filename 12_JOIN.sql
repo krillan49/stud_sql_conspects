@@ -209,7 +209,7 @@ LEFT JOIN units u2 ON r.check_unit_id = u2.unit_id
 FROM (SELECT * FROM table1) AS alias_name
 
 
--- LATERAL Подзапросы   -   CROSS JOIN LATERAL - вывод новых строк из одной строки
+-- LATERAL Подзапросы   -   CROSS JOIN LATERAL - вывод новых строк из одной строки. Латерал джойны позволяют джойнить подзапросы ссылающиеся на поля других таблиц, тоесть коррелированные
 SELECT s.results FROM strings
 CROSS JOIN LATERAL unnest(string_to_array(string, ' ')) AS s(results)  -- тут results название столбца на выходе а s - хз что (мб s(results) просто имя те скобки не функциональны ??)
 
