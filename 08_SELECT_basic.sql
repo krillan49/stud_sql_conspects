@@ -288,36 +288,6 @@ MD5(RANDOM()::TEXT)  -- пример
 
 
 
---                       Window Functions - для вывода новых колонок нумерации по определенному порядку
-
--- ROW_NUMBER() OVER(ORDER BY ...) - вывести новую колонку порядковых номеров по убыванию относительно значений указанной колонки
-SELECT ROW_NUMBER() OVER(ORDER BY points DESC) AS rank FROM people;
-SELECT ROW_NUMBER() OVER(ORDER BY SUM(points) DESC) AS rank FROM people GROUP BY some;   -- с группировкой
-
--- ROW_NUMBER() OVER(PARTITION BY ...)
-ROW_NUMBER() OVER(PARTITION BY store_id ORDER BY count(*) DESC, category.name DESC) AS category_rank  -- разбивка ранга по значениям столбца store_id (когда новое значения ранг начинается снова с 1 при каждом новом значении store_id)
-
-
--- RANK() OVER(ORDER BY ...) - работает так же как ROW_NUMBER() но при одинаковых значениях ставит одинаковый ранг. Дальнейший ранг учитывает все столбцы до, например 1, 1, 3
-SELECT sale, RANK() OVER(ORDER BY sale DESC) AS srank FROM sales             -- создаем колонку рангов цен
-SELECT sale, RANK() OVER(ORDER BY sale DESC, some DESC) AS srank FROM sales  -- ранг по 2м полям, если 1е равно использует 2е
-SELECT depname, empno, salary, RANK() OVER (PARTITION BY depname ORDER BY salary DESC) FROM empsalary;
--- Разбивает ранк на подразделы по depname, те лоя каждого значения depname будет свой ранк(те с каждым новым значением depname, ранк заново считается с единицы)
-
-
--- DENSE_RANK() OVER(ORDER BY SUM(имя_колонки) DESC) - работает так же как ROW_NUMBER() только при одинаковых значениях ставит одинаковый ранг. Дальнейший ранг не учитывает все столбцы до, например 1, 1, 2
-
-
--- Делаем ранк нечетным (1, 3, 5 ...). Соотв четным без "- 1"
-SELECT *, (ROW_NUMBER() OVER(ORDER BY birth_date DESC)) * 2 - 1 AS rank FROM employees
-
-
--- Хз как это работает. Мб LAG это именение последовательности, например сперва возрастала потом убывает и отсюда ранг опять с 1 ??
-LAG(price) OVER (ORDER BY trade_date) prev_price
-lag(price, 1, price - 1) over (order by trade_date) as drop
-
-
-
 
 
 
