@@ -103,9 +103,12 @@ GROUP BY rental_date::DATE;
 
 
 
---                                            Задание рамок окна
+--                                       Задание рамок окна. Родственные строки
 
--- ROWS BETWEEN - задает значения рамок окна(включительно), что взять только часть строк из таблицы или группы, заданные этими рамками, а не все, для применения их в оконной функции
+-- ?? Мб потом про родственные строки и ORDER BY в агрегатных оконных функциях перенести наверх к описанию описаний окна ??
+
+
+-- 1. ROWS BETWEEN - задает значения рамок окна(включительно), что взять только часть строк из таблицы или группы, заданные этими рамками, а не все, для применения их в оконной функции
 
 -- Варианты значений рамок окна:
 -- CURRENT ROW         - текущая строка
@@ -114,11 +117,42 @@ GROUP BY rental_date::DATE;
 -- 3 FOLlOWING         - количество строк(тут 3) после текущей
 -- UNBOUNDED FOLlOWING - все строки после текущей
 
--- Проссуммируем продажи за каждые 3 дня (для 1й строки возьмет только 1 день, для 2й только 2, тк выше ничего нет)
+-- Просуммируем продажи за каждые 3 дня (для 1й строки возьмет только 1 день, для 2й только 2, тк выше ничего нет)
 SELECT rent_day, amount,
   SUM(amount) OVER(ORDER BY rent_day ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS tree_days_before_amount, -- тоесть берет 2 строки между включительно 2мя(начало диапазона) до и текущей(конец диапазона) == 3
-  SUM(amount) OVER(ORDER BY rent_day ROWS BETWEEN 2 PRECEDING AND 3 FOLLOWING) AS week_amount
+  SUM(amount) OVER(ORDER BY rent_day ROWS BETWEEN 2 PRECEDING AND 3 FOLLOWING) AS week_amount,
+  SUM(amount) OVER(ORDER BY rent_day ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cum_amount_row  -- а так в каждой строке будет сумма всех продаж с начала и по текущий день
 FROM rent_day;
+
+
+-- 2. RANGE BETWEEN - задает значения рамок окна как и ROWS BETWEEN, но если значения по которым сортируем в каких-то строках равны(тоесть при одном и том же запроса они могут стоять в разном порядке относительно друг друга, тоесть при ROWS BETWEEN у них могут быть разные суммы при повторном запросе), то они являются родственными. ROWS BETWEEN берет например все строки до, текущую и все строки после если они заданны, а RANGE возьмет все тоже, но еще и все родственные уже взятым строки
+
+SELECT rent_day, amount,
+  SUM(amount) OVER(ORDER BY rent_day RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cum_amount_row  -- а так в каждой строке будет сумма всех продаж с начала и по текущий день + все родственные строки
+FROM rent_day;
+
+-- Если мы указываем ORDER BY в агрегатных оконных функциях, то автоматически будут применены рамки окна с параметрами RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+SELECT rating, length,
+  SUM(langth) OVER(PARTITION BY rating) AS sum_length,    -- тоесть тут в каждой группе будет сумма всей группы, по умолчанию все строки родственные тк не задано поле для сортировки
+  SUM(langth) OVER(PARTITION BY rating ORDER BY langth) AS sum_length2, -- а тут в кажой группе будет сумма в рамках окна с параметрами RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW, те от начала до текущей строки + родственные по условию сортировки
+  SUM(langth) OVER(PARTITION BY rating ORDER BY langth RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS sum_length3, -- тут будет тоже самое как и выше, тк это значение рамок по умолчанию
+  SUM(langth) OVER(PARTITION BY rating ORDER BY langth, film_id) AS sum_length4 -- чтобы исключить родственные просто сделаем строки уникальными добавив новые колонки в сортировку
+FROM films;
+
+
+
+--                                  Оконные функции получения конкретной строки
+
+-- FIRST_VALUE() - оконная функция вернет значение 1й строки в таблице или группе
+-- LAST_VALUE() - оконная функция вернет значение последней строки в таблице или группе
+
+SELECT rating, length,
+  FIRST_VALUE(langth) OVER(PARTITION BY rating ORDER BY langth) AS first_length,    -- получим значение длинны 1й строки(тоесть минимальной) для этой группы (с таким же рейтингом как в данной строке)
+  LAST_VALUE(langth) OVER(PARTITION BY rating ORDER BY langth) AS first_length, -- так не получим значение длинны последней строки, тк по умолчанию у нас стоят рамки окна RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW, тоесть строки до текущей, а последнее значение будет равно текущий с этими условиями
+  LAST_VALUE(langth) OVER(PARTITION BY rating ORDER BY langth RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLlOWING) AS first_length, -- так изменив рамки окна на все строки уже получим значение длинны последней строки(тоесть максимальной) для этой группы (с таким же рейтингом как в данной строке)
+FROM films;
+
+
 
 
 
