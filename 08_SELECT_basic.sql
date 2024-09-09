@@ -183,6 +183,9 @@ REGEXP_COUNT('ABCABCAXYaxy', 'A.', 1, 'i') --> 4
 
 --                                           Функции для даты и времени
 
+-- [PostgreSQL]
+NOW() -- функция фозвращает текущее значение даты и времени, моднно использовать в любых запросах, в том числе и в ограничения DEFAULT при заполнении таблицы
+
 -- YEAR/MONTH/DAY/HOUR/MINUTE возвращает год/месяц/... для указанной даты
 SELECT YEAR("2022-06-16") AS year;                                --> 2022
 SELECT EXTRACT(MONTH FROM payment_date) AS month FROM payment     -- [postgresql]  Для timestamp without time zone

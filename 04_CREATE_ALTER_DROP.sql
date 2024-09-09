@@ -68,9 +68,13 @@ CREATE TABLE Users (id INT PRIMARY KEY, name VARCHAR(255) NOT NULL, age INT NOT 
 -- [PostgreSQL] тоже самое
 CREATE TABLE publisher
 (
+  -- Задаем все поля, их типыданных и ограничения которые будут в таблице publisher
   publisher_id INTEGER PRIMARY KEY,
-  org_name VARCHAR(128) NOT NULL,
+  org_name VARCHAR(128) NOT NULL, -- По умолчанию ограничение NULL, значит возможны значения NULL
   address TEXT NOT NULL
+  raiting FLOAT DEFAULT(0) NOT NULL, -- с указанием значения по умолчанию
+  registrated TIMESTAMP DEFAULT(NOW()) NOT NULL,
+  deleted BOOL DEFAULT(FALSE) NOT NULL
 );
 
 -- [PostgreSQL]
@@ -224,7 +228,7 @@ DROP INDEX Someidex ON people;          -- удаляем инлекс Someidex 
 -- [ PostgreSQL ] Основная команда изменения таблиц:
 ALTER TABLE table_name
 -- Подкоманды после ALTER TABLE:
-ADD COLUMN column_name data_type                  -- добавить новую колонку с именем и типом данных
+ADD COLUMN column_name column_type ograns         -- добавить новую колонку с именем и типом данных и ограничениями
 RENAME TO new_table_name                          -- изменить название таблицы
 RENAME old_column_name TO new_column_name         -- изменить название столбца на другое
 ALTER COLUMN column_name SET DATA TYPE data_type  -- изменить тип данных столбца
@@ -235,6 +239,8 @@ DROP CONSTRAINT constraint_name                   -- удалить ограни
 ADD COLUMN price decimal CONSTRAINT CHK_book_price CHECK (price > 0);   -- добавим колонку сразу с констрэйтом
 ALTER COLUMN status SET DEFAULT 'r';           -- добавить значение по умолчанию
 ALTER COLUMN status DROP DEFAULT;              -- убрать значение по умолчанию
+
+ALTER TABLE tab1 ADD COLUMN col1 INT DEFAULT(0) NOT NULL -- если добавляем колонку с NOT NULL, то нужно добавить и DEFAULT, чтобы колонка могла быть создана, иначе будет ошибка
 
 -- Добавим первичный ключ в колонку exam_id таблицы exam
 ALTER TABLE exam
