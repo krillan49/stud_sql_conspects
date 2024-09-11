@@ -45,6 +45,18 @@ FROM products JOIN suppliers USING (supplier_id) JOIN categories USING (category
 -- Это представление сохранено в БД (в ПГАдмин будет в подразделе нашей схемы) и теперь мы можем делать к нему SELECT-запросы:
 SELECT * FROM products_suppliers_categories;                       -- результат как у запроса из представления
 SELECT * FROM products_suppliers_categories WHERE unit_price > 20; -- можем дополнительно отфильтровать
+SELECT * FROM products_suppliers_categories JOIN some USING(id);   -- можем сджойнить с таблицей или другим представлением
+
+-- Так мы создали не матеарилизованное представление - тоесть при запросе к представлению в блок FROM или JOIN или еще где, вместо названия представления будет подставляться и каждый раз заново исполняться весь запрос
+
+-- CREATE MATERIALIZED VIEW  - создает материализованное представление, будет создана реальная таблица, в которой будет сохранен результат запроса. Используется не очень часто.
+CREATE MATERIALIZED VIEW products_suppliers_categories AS
+SELECT product_name, quantity_per_unit, unit_price, units_in_stock, company_name, contact_name, phone, category_name, description
+FROM products JOIN suppliers USING (supplier_id) JOIN categories USING (category_id);
+-- результат как у запроса теперь будет из этой созданной таблицы, без выполненения запроса представления каждый раз
+SELECT * FROM products_suppliers_categories;
+-- Его плюс в быстродействии, но минус в том что при обновлении данных в изначальных таблицах, тут их не будет и придется создавать новое материализованное представление либо делать рефрэш, что по сути почти тоже, тк будет заново выполнен селект-запрос представления:
+REFRESH MATERIALIZED VIEW products_suppliers_categories
 
 
 

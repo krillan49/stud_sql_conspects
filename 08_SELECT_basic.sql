@@ -232,13 +232,6 @@ minutes_diff * 60 + DATE_PART('minute', last - first )                   -- Seco
 -- TIMESTAMPDIFF(SECOND, time_out, time_in) - среднее время в секундах между time_out и time_in
 SELECT TIMESTAMPDIFF(SECOND, time_out, time_in) AS time FROM Trip               --> время полета
 
--- https://www.postgresql.org/docs/current/functions-formatting.html  Форматирование даты [postgresql]
-TO_CHAR(timestamp, 'FMmonth, YYYY FMDD HH12:MI:SS')            --> 	february, 2023 19 12:00:00
-TO_CHAR(timestamp, 'FMMonth, YYYY FMDD HH12:MI:SS')            --> 	February, 2023 19 12:00:00
-TO_CHAR('2023-05-08 13:00:00 +0000', 'HH12AM:MI')              -->  01PM:00
-TO_CHAR('2023-05-08 13:00:00 +0000', 'HH12:MI AM')             -->  01:00 PM
-'FMDD "days and" FMHH24 "hours ago"'                           --  левый текст в форматировании вставляем в 2йных кавычках
-
 
 
 --                                        Математические/числовые функции
@@ -270,14 +263,7 @@ SQRT(num)                                                -- [PostgreSQL ??] ко
 GCD(1071, 462)                                           -- 21  Наибольший общий множитель
 
 
-
 factorial(n)                                             -- [PostgreSQL] считае факториал от n
-
--- https://www.postgresql.org/docs/16/functions-formatting.html
-TO_CHAR(num, '99.99')                -- форматирование числел, тут до 2х знаков с обеих сторон (зачемто добавляет пробел вначале)
--- 9 - будет обрезан 0 в начале
--- 0 - не будет обрезан 0 в начале
-TO_CHAR(num, 'FM999990.0%')         -- перевод в строку с определенным числом нулей после точки и еще всяким(тут символ %)
 
 
 
