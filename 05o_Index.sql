@@ -3,6 +3,9 @@
 -- !! Потом какото сопоставить с 07o_optimization !!
 
 
+-- https://habr.com/ru/articles/247373/  про индексы
+
+
 
 --                                    Устройство баз данных в PostgreSQL
 
