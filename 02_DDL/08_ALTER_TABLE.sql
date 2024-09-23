@@ -1,11 +1,3 @@
---                                            DROP TABLE Удаление таблиц
-
--- [PostgreSQL, MySQL]
-DROP TABLE имя_таблицы;                   -- удалить таблицу "имя_таблицы" из текущей БД
-DROP TABLE IF EXISTS имя_таблицы;         -- удаление только если она существует
-
-
-
 --                                 ALTER TABLE добавление/изменение/удаление колонок
 
 -- https://www.postgresql.org/docs/current/sql-altertable.html

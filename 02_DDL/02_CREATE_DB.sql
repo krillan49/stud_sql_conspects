@@ -1,9 +1,3 @@
---                                        Создание, удаление баз данных.
-
-SHOW DATABASES;   -- (?? в скюлайт не работает ??) выведет все БД и таблицы, в том числе служебные(information_schema, mysql, performance_schema, sys)
-
-
-
 --                                        CREATE DATABASE - Создание БД
 
 -- https://www.postgresql.org/docs/current/sql-createdatabase.html
@@ -48,19 +42,6 @@ END
 $$ LANGUAGE plpgsql;
 -- Теперь вы можете создать базу данных, вызвав:
 create_database_if_not_exists('ваша_бд')
-
-
-
---                                        DROP DATABASE Удаление БД
-
-DROP DATABASE имя_базы_данных;                  -- Удаление БД во всех СУБД:
-DROP DATABASE IF EXISTS имя_базы_данных;        -- [ PostgreSQL, MySQL ] удаление БД только если она существует (?? во всех СУБД)
-
-
--- [PostgreSQL] У той БД которую хотим удалить не должен существовать сеанс подключения иначе возникнет ошибка. Чтобы удалить все подключения к некой БД:
-SELECT pg_terminate_backend(pg_stat_activity.pid)
-FROM pg_stat_activity
-WHERE pg_stat_activity.datname = 'имя_бд' AND pid <> pg_backend_pid()
 
 
 
