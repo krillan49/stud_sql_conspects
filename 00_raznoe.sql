@@ -21,6 +21,7 @@ FROM table_name;
 
 
 SELECT * FROM information_schema.tables;   -- инфа о всех таблицах в БД
+SELECT table_name AS total FROM information_schema.tables;  -- инфа об именах таблиц
 
 
 -- Создание индексов для ускорения запроса с большим числом строк
