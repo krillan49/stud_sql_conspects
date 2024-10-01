@@ -18,7 +18,7 @@ SELECT * FROM Orders ORDER BY sum DESC, timeA ASC;
 -- Можно сортировать по псевдонимам
 SELECT name f, second_name s FROM actors ORDER BY f, s DESC;
 
--- Можно используем номер колонки в таблице или запроса вместо названия
+-- Можно использовать номер колонки в таблице или запроса вместо названия
 SELECT * FROM companies ORDER BY 1, 4 DESC;    -- сортируем по 1й и 4й колонке
 
 -- Можно комбинировать все виды способов сортировки

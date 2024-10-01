@@ -25,6 +25,18 @@ SELECT rating, length, MIN(langth) OVER(PARTITION BY rating) AS min_rating_lengt
 
 
 
+--                                  FILTER. Фильтрация в оконных функциях
+
+-- FILTER - задает ограничение(условие) для значений, которые будут обрабатываться оконной функцией. Тоесть аоконная функция обработает не все значения в группе, а только соответсвующие условию.
+SELECT
+  rating,
+  COUNT(*) OVER(PARTITION BY rating),                            -- посчтитает общее число фиьмов
+  COUNT(*) FILTER(WHERE length > 100) OVER(PARTITION BY rating), -- посчитаем колличество фильмов определенной продолжительности
+  COUNT(*) FILTER(WHERE length > 120) OVER(PARTITION BY rating)
+FROM films GROUP BY rating;
+
+
+
 --                                               WINDOW
 
 -- Если у всех оконных функций в запросе одно и тоже описание окна, то мы можем описать его в разделе WINDOW, а в OVER просто передать его название
@@ -149,6 +161,22 @@ SELECT rating, length,
   LAST_VALUE(langth) OVER(PARTITION BY rating ORDER BY langth) AS first_length,  -- так не получим значение длинны последней строки, тк по умолчанию у нас стоят рамки окна RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW, тоесть строки до текущей, а последнее значение будет равно текущий с этими условиями
   LAST_VALUE(langth) OVER(PARTITION BY rating ORDER BY langth RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLlOWING) AS first_length, -- так изменив рамки окна на все строки уже получим значение длинны последней строки(тоесть максимальной) для этой группы (с таким же рейтингом как в данной строке)
 FROM films;
+
+
+
+--                                              Разные примеры
+
+-- С условным оператором в условии оконной функции
+SELECT *, SUM(CASE WHEN op = 'add' THEN amount ELSE -amount END) OVER(ORDER BY date, id) AS fl_sum
+FROM actions ORDER BY date, id;
+
+
+-- Оконная фунуция выводит: сумму во всех строках, сумму для каждого customer_id итд
+SELECT sales_id, customer_id, cnt,
+  SUM(cnt) OVER () AS total,
+  SUM(cnt) OVER (ORDER BY customer_id) AS running_total,
+  SUM(cnt) OVER (ORDER BY customer_id, sales_id) AS running_total_unique
+FROM sales ORDER BY customer_id, sales_id;
 
 
 
