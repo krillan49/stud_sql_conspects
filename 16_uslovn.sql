@@ -1,13 +1,18 @@
 --                                   CASE (условный оператор/условная логика)
 
--- Условный оператор CASE можно использовать: в полях SELECT, при вычислении условий в WHERE или HAVING, при вычислении условий при соединении таблиц, при сортировке,
+-- Условный оператор CASE можно использовать:
+-- в полях SELECT
+-- при вычислении условий в WHERE или HAVING
+-- при вычислении условий при соединении таблиц
+-- при сортировке
 
 
--- 1. CASE в полях SELECT - результат чаще всего представляет собой значение какогото нового выводимого столбца
+-- 1. SELECT - результат CASE в полях SELECT чаще всего представляет собой значение какого-то нового выводимого столбца
 SELECT
   name,
-  CASE             --  несколько условий(если первое не срабатывает переходим ко второму итд)
+  CASE
     WHEN SUBSTRING(name, 1, INSTR(name, ' ')) IN (10, 11) THEN 'Старшая школа'
+    -- несколько условий, если первое не срабатывает переходим ко второму итд
     WHEN SUBSTRING(name, 1, INSTR(name, ' ')) IN (5, 6, 7, 8, 9) THEN 'Средняя школа'
     ELSE 'Начальная школа'  -- если не указать ELSE и все условия окажутся не верны то вернет NULL
   END AS stage     --  возвращаем в новую колонку stage со значением в зависимости от условия
@@ -36,6 +41,15 @@ SELECT p.name,
   COUNT(CASE WHEN d.detail = 'bad' THEN 1 ELSE 0 END) AS bad
 FROM products p JOIN details d ON p.id = d.product_id
 
+-- CASE при группировке
+SELECT neme, SUM(num)
+  CASE
+    WHEN SUM(num) >= 150 THEN 'Top'
+    WHEN SUM(num) >= 100 THEN 'Mid'
+    ELSE 'Low'
+  END AS rating
+FROM numbers GROUP BY name
+
 -- CASE внутри CASE
 SELECT id, balance, portions_by_plan, portions_possible,
   CASE
@@ -49,32 +63,19 @@ SELECT id, balance, portions_by_plan, portions_possible,
 FROM items
 
 
--- 2. CASE - для выбора столбца для сортировки в зоне ORDER BY
+-- 2. ORDER BY - результат CASE в зоне ORDER BY для выбора столбца для сортировки
 SELECT contact_name, city, country
 FROM customers
 ORDER BY contact_name, (CASE WHEN city IS NULL THEN country ELSE city END); -- тоесть в зависимости от условий сортировать будем либо по country, либо по city, хз обязательны ли скобки.
 
 
--- 3. CASE при вычислении условий в WHERE
-SELECT * FROM class
-WHERE SUBSTRING(CASE WHEN n = 1 THEN f_name WHEN n = 2 THEN m_name ELSE l_name END, 1, 2) = 'Kr';
-
+-- 3. WHERE - результат CASE в зоне WHERE для фильтрации в зависимости от условий
+SELECT * FROM class WHERE SUBSTRING(CASE WHEN n = 1 THEN f_name WHEN n = 2 THEN m_name ELSE l_name END, 1, 2) = 'Kr';
 SELECT * FROM film WHERE length > CASE WHEN rating = 'G' THEN 90 ELSE 120 END;
 
 
--- 4. CASE при вычислении условий при JOIN
-SELECT * FROM class JOIN class2 ON CASE WHEN class.grade = 'A' THEN 1 ELSE class.subject_id END = class2.subject_id -- тоесть соединяем строку 2й таблице в которой subject_id будет соответсвовать обределенному тестовому значению из class.grade если 1е условие срабатывает, остальное будем соединять по соответсвию айди
-
-
--- 5. CASE при группировке
-SELECT neme, SUM(num)
-  CASE
-    WHEN SUM(num) >= 150 THEN 'Top'
-    WHEN SUM(num) >= 100 THEN 'Mid'
-    ELSE 'Low'
-  END AS rating
-FROM numbers GROUP BY name
-
+-- 4. JOIN ON - результат CASE в зоне JOIN ON для вычисления условий соединения
+SELECT * FROM class JOIN class2 ON CASE WHEN class.grade = 'A' THEN 1 ELSE class.subject_id END = class2.subject_id -- тоесть соединяем строку 2й таблицы в которой subject_id будет соответсвовать обределенному текстовому значению из class.grade если 1е условие срабатывает, остальное будем соединять по соответсвию айди
 
 
 
