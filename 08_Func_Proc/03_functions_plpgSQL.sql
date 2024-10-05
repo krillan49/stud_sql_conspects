@@ -1,4 +1,4 @@
---                                           Функции pl/pgSQL
+--                                            Функции pl/pgSQL
 
 -- pl/pgSQL - язык процедурных расширений, для написания императивного кода, например может:
 -- Создавать переменные в теле функции
@@ -6,19 +6,22 @@
 -- Выбрасывать исключения
 -- итд еще многие возможности процедурного программирования
 
--- Синтаксис функции pl/pgSQL. Синтаксис похож, но логика функции должна дополнительно обрамляться в BEGIN END, что обозначает тело метода (не относятся к аналогичному синтаксису для транзакций):
+-- Функции могут быть вызваны внутри других функций
+
+-- Синтаксис функции pl/pgSQL - логика функции должна дополнительно обрамляться в BEGIN END, что обозначает тело метода (не относятся к аналогичному синтаксису для транзакций):
 CREATE [ OR REPLACE ] FUNCTION func_name([arg1, arg2, ...]) RETURNS data_type AS $$
 BEGIN
   -- тело функции с какой-то логикой
-END; -- точка с запятой не обязательно
+END; -- точка с запятой не обязательны
 $$ LANGUAGE plpgsql;
 
 
 
 --                                           Возврат и присвоение
 
--- Возврат скалярного значения производиттся из тела функции через RETURN вместо SELECT. RETURN не обязателен если используем OUT-параметры
--- Возврат множественных значений поизводится через RETURN QUERY в дополнение к SELECT
+-- Возврат скалярного значения производиттся из тела функции через RETURN вместо SELECT.
+-- RETURN не обязателен если используем OUT-параметры
+-- Возврат множественных значений (RETURNS SETOF итд) поизводится через RETURN QUERY в дополнение к SELECT
 
 
 -- Скалярная функцияи на plpgsql, которая возвращает число:
@@ -28,7 +31,7 @@ BEGIN
 	RETURN SUM(units_in_stock) FROM products WHERE discontinued = 1; -- нужна точка с запятой в конце
 END;
 $$ LANGUAGE plpgsql;
--- Оператор такой же
+-- Оператор работает стандартно
 SELECT get_total_number_of_goods();
 
 
@@ -69,34 +72,24 @@ SELECT * FROM get_customers_by_country('USA');
 
 
 
---                                      DECLARE. Декларация/объявление переменных
+--                                  DECLARE. Объявление локальных переменных в функции
 
 -- Если хотим создать новые переменные не передававшиеся в функцию через параметры, то нужен другой синтаксис, с добавлением секции DECLARE перед секцией BEGIN и определить переменные и их типы данных там
-
--- Синтаксис декларации переменных
-CREATE OR REPLACE FUNCTION func_name([ag1, arg2...]) RETURNS data_type AS $$
-DECLARE
-	variable var_type;
-  variable2 var2_type := 2; -- при инициализации сразу можем присвоить начальное значение
-BEGIN
-  -- логика;
-END;
-$$ LANGUAGE plpgsql;
-
 
 -- Функция с декларацией переменной
 CREATE OR REPLACE FUNCTION get_square(ab real, bc real, ac real) RETURNS real AS $$
 DECLARE
-	perimeter real;
+	perimeter real;       -- обявление пустой переменной
+	del INT := 2;         -- при объявлении сразу можем присвоить начальное значение в новую переменную
 BEGIN
-	perimeter:=(ab+bc+ac)/2;
-	RETURN SQRT(perimeter * (perimeter - ab) * (perimeter - bc) * (perimeter - ac)); -- тут считаем с применением встроенной функции
+	perimeter:=(ab+bc+ac)/del; -- результат расчета с использованием одной переменной присваиваем в другую
+	RETURN SQRT(perimeter * (perimeter - ab) * (perimeter - bc) * (perimeter - ac)); -- считаем с применением встроенной функции
 END;
 $$ LANGUAGE plpgsql;
 SELECT get_square(6, 6, 6);
 
 
--- Функция с вычислением средней цены по продуктам из таблицы и от нее расчета вехней и нижней границы цен
+-- Функция с применением новых переменных для выборки из таблицы
 CREATE OR REPLACE FUNCTION middle_priced() RETURNS SETOF products AS $$
 	DECLARE
 		average_price real;
@@ -104,16 +97,16 @@ CREATE OR REPLACE FUNCTION middle_priced() RETURNS SETOF products AS $$
 		top_price real;
 	BEGIN
 		SELECT AVG(unit_price) INTO average_price FROM products; -- присваиваем значение запроса в новую переменную average_price
-		bottom_price := average_price * .75;  -- используем новые переменные, присваимваем в них значения границ цен
+		bottom_price := average_price * .75;                     -- присваимваем в новые переменные значения границ цен
 		top_price := average_price * 1.25;
-		RETURN QUERY SELECT * FROM products WHERE unit_price BETWEEN bottom_price AND top_price; -- возвращаем строки соответсвующие границам цен из переменных
+		RETURN QUERY SELECT * FROM products WHERE unit_price BETWEEN bottom_price AND top_price; -- возвращаем строки таблицы соответсвующие границам цен из переменных
 	END;
 $$ LANGUAGE plpgsql;
 SELECT * FROM middle_priced();
 
 
 
---                                              Логика с IF ELSE
+--                                            Условный оператор IF ELSE
 
 -- Синтаксис условной логики IF ELSE:
 IF expression THEN
@@ -174,14 +167,14 @@ LOOP
 	-- логика
 END LOOP;
 
--- Бесконечный цикл, выход из которого осуществляется, когда expression в EXIT WHEN является TRUE:
+-- Бесконечный цикл, выход из которого осуществляется, EXIT WHEN:
 LOOP
 	EXIT WHEN expression
 	-- логика
 END LOOP;
 
 -- FOR цикл. Вместо a и b можно подставить числовые литералы
--- BY      - задает числовой литерал для шага, который по умолчанию равен 1
+-- BY      - задает числовой литерал n для шага, который по умолчанию равен 1
 -- REVERSE - реверсирует цикл в обратном порядке, нужно чтобы a было больше b, а значение n по умолчанию станет отрицательным
 FOR counter IN [REVERSE] a..b [BY n]
 LOOP
@@ -193,7 +186,7 @@ END LOOP;
 -- CONTINUE - прерывает исполнение локиги и переходит к следующей итерации
 CONTINUE [WHEN expression]
 
--- EXIT - аналог break в яп, выходит из цикла
+-- EXIT - аналог break в яп, выходит из цикла, осуществляется, когда expression в EXIT WHEN является TRUE
 EXIT [WHEN expression]
 
 
@@ -213,7 +206,7 @@ BEGIN
   WHILE counter <= n
   LOOP
     counter := counter + 1;
-    SELECT j, i + j INTO i, j; -- переназначаем значения следующих числе Фибоначи
+    SELECT j, i + j INTO i, j; -- переназначаем значения переменных для следующих чисел Фибоначи
   END LOOP;
   RETURN i;
 END;
@@ -286,7 +279,7 @@ END; $$
 -- FOR IN. Для итерации запроса
 CREATE OR REPLACE FUNCTION iter_over_query(n INTEGER DEFAULT 5) RETURNS VOID AS $$
 DECLARE
-  rec RECORD;
+  rec RECORD;  -- RECORD - тоесть тип данных запрос ??
 BEGIN
   FOR rec IN
 		SELECT * FROM products ORDER BY unit_price LIMIT n
@@ -299,7 +292,7 @@ SELECT * FROM iter_over_query();
 
 
 
---                                                  RETURN NEXT
+--                                    RETURN NEXT (Неэффективен по быстродействию)
 
 -- Иногда нам нужно делать построчный процессинг, тоесть накапливать записи в результирующем наборе, тоесть обрабатывать каждую строку и помещать(возвращать) ее в результирующий набор. Как правило это все делается в цикле
 
@@ -317,7 +310,7 @@ BEGIN
   RETURN NEXT 1; -- значение 1 отправляется в результирующий набор
   RETURN NEXT 2; -- значение 2 отправляется в результирующий набор
   RETURN NEXT 3;
-  RETURN; -- Необязательный
+  RETURN;        -- необязательно
 END
 $$ LANGUAGE plpgsql;
 SELECT * FROM return_setof_int() -- выведет столбец со значениями 1, 2, 3

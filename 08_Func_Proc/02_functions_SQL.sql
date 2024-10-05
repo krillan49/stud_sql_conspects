@@ -1,15 +1,12 @@
--- Непонятно:
--- RETURNING <- Оператор функции. VOID. RETURNING
-
-
-
 --                                 Синтаксис создания функции на языке SQL
 
 -- CREATE FUNCTION            - Создает новую функцию
 -- CREATE OR REPLACE FUNCTION - Создает новую функцию или модифицирует уже существующую функцию с этим названием, тоесть заменяет функционал(тело) на новый
+
 CREATE [OR REPLACE] FUNCTION func_name([arg1, arg2, ...]) RETURNS data_type AS $$
   -- тело функции с какой-то логикой
 $$ LANGUAGE lang;
+
 -- arg1, arg2, ...    - Аргументы функции(не обязательны) - переменные с типами данных
 -- RETURNS data_type  - указываем тип данных, которые будут возвращены
 -- $$                 - знак открытия и закрытия тела функции (есть еще способ с кавычками он он хуже, тк придется экранировать кавычки в логике функции, использовались до 8й версии )
@@ -27,24 +24,20 @@ DROP FUNCTION IF EXISTS func_name;
 
 --                                      Оператор функции. VOID. RETURNING
 
--- Функция без аргументов, в которой будем заменять в таблице tmp_customers значения NULL на 'unknown'
+-- Функция которая не принимает аргументы и ничего не возвращает, а только исполняет нейкий код
 CREATE OR REPLACE FUNCTION fix_customer_region() RETURNS void AS $$
-	-- RETURNS void   - тк функция будет только изменять значения и ничего не будет возвращать(NULL)
-	UPDATE tmp_customers
-  SET region = 'unknown'
-  WHERE region IS NULL
+	-- RETURNS void  - функция ничего не будет возвращать(NULL)
+	UPDATE tmp_customers SET region = 'unknown' WHERE region IS NULL -- Код функции и соодветсвенно - функция будет только заменять в таблице tmp_customers значения NULL на 'unknown'
 $$ LANGUAGE sql;
--- Чтобы запустить функцию, нужно вызвать ее оператор, если функция ничего не возвращает как тут, то вернет NULL. Вызывается, через SELECT-запрс к ее оператору:
-SELECT fix_customer_region();
+-- Функция вызывается, через SELECT-запрс к ее оператору. Если функция ничего не возвращает как тут, то вернет NULL.
+SELECT fix_customer_region(); --> NULL
 
 
--- ???
+-- (??? RETURNS TABLE(...какието столбцы соотв возвращенному...) void - тут void не нужен ???)
 -- Если функция не объявлена ​​возвращающей void, последний оператор должен быть SELECT или INSERT, UPDATE или DELETE с предложением RETURNING.
 CREATE OR REPLACE FUNCTION fix_customer_region() RETURNS TABLE(...какието столбцы соотв возвращенному...) void AS $$
-	UPDATE tmp_customers
-  SET region = 'unknown'
-  WHERE region IS NULL
-	RETURNING *; -- возврвщаем измененную таблицу
+	UPDATE tmp_customers SET region = 'unknown' WHERE region IS NULL
+	RETURNING *; -- возврвщаем измененную таблицу при помощи оператора RETURNING
 $$ LANGUAGE sql;
 SELECT * FROM fix_customer_region();
 
@@ -77,21 +70,20 @@ SELECT get_max_price_from_discontinued() AS max_price;
 
 --                             Аргументы SQL-функций: IN, OUT, INOUT, VARIADIC, DEFAULT
 
--- IN       - неявно(по умолчанию) помечает входящие аргуметы, которые мы объявляем. Можно указывать и явно
+-- IN       - неявно(по умолчанию) помечает входящие аргуметы, которые мы объявляем. Тоесть IN прописывать не обязательно, но можно указывать и прописать
 -- OUT      - помечает исходящие аргументы, для вывода от оператора функции, объявляются так же внутри круглых скобок в строке создания функции, а не после RETURNS, тоесть можем опустить RETURNS, когда используем OUT-аргументы
 -- INOUT    - помечает аргумент, который используется и как входящий и как исходящий
 -- VARIADIC - помечает массив входящих параметров, тоесть оперетор может передавать любое колличество значений через запятую
 -- DEFAULT  - присваивает аргументу значение по умолчанию (на случай если аргумент не передан), прописываем после имени аргумента и типа данных
 
--- Типы данных должны быть как в таблице (или совместимые с ними ??)
+-- Типы данных должны быть как в таблице (или совместимые с ними)
 
 
 -- IN.  Функция, вернет цену продукта по его имени
 CREATE OR REPLACE FUNCTION get_product_price_by_name(prod_name varchar) RETURNS real AS $$
 	-- prod_name varchar - задаем входящий(IN задан неявно) аргумент переменной с произвольным именем и типом данных
-	SELECT unit_price FROM products
-	WHERE product_name = prod_name  -- тоесть выбираем строку по соответсвию значения из аргумента
-	-- тут на самом деле нет гарантии что название уникально и может вернуться таблица, (? тоесть будет ошибка), соотв надо продумать это заране
+	SELECT unit_price FROM products WHERE product_name = prod_name -- выбираем строку по соответсвию значения из аргумента.
+	-- Так на самом деле нет гарантии что название уникально и может вернуться таблица, (? тоесть будет ошибка), соотв надо продумать это заране
 $$ LANGUAGE sql;
 -- Оператор/клиентский код при вызове функции передает значение в аргумент, предполагаемого типа данных
 SELECT get_product_price_by_name('Chocolade') AS price;
@@ -99,8 +91,7 @@ SELECT get_product_price_by_name('Chocolade') AS price;
 
 -- OUT.  Функция с OUT-аргументами для вывода максимальной и минимальной цены. Тут можем опустить RETURNS
 CREATE OR REPLACE FUNCTION get_price_boundaries(OUT max_price real, OUT min_price real) AS $$
-	SELECT MAX(unit_price), MIN(unit_price) -- последовательность вывода нужно сопоставить с последовательностью аргументов, когда мы пишем функции на языке sql
-	FROM products
+	SELECT MAX(unit_price), MIN(unit_price) FROM products -- последовательность вывода должна соответсвовать последовательности OUT-аргументов
 $$ LANGUAGE sql;
 -- При таком вызове мы получим так называемый record все будет в одной колонке
 SELECT get_price_boundaries();
@@ -108,7 +99,7 @@ SELECT get_price_boundaries();
 SELECT * FROM get_price_boundaries();
 
 
--- Функция и с IN(не обязательно прописывать) и с OUT параметрами
+-- Функция и с IN и с OUT параметрами
 CREATE OR REPLACE FUNCTION get_freight_boundaries(IN start_date date, end_date date, OUT max_price real, OUT min_price real) AS $$
 	SELECT MAX(freight), MIN(freight) FROM orders WHERE shipped_date BETWEEN start_date AND end_date
 $$ LANGUAGE sql;
@@ -119,7 +110,7 @@ SELECT * FROM get_freight_boundaries('1997-06-01', '1997-06-12');
 
 -- DEFAULT.  Функция с DEFAULT значением для IN-аргумента
 CREATE OR REPLACE FUNCTION get_price_boundaries_by_discont(
-		is_discontinued int DEFAULT 1, OUT max_price real, out min_price real
+		is_discontinued int DEFAULT 1, OUT max_price real, OUT min_price real
 	) AS $$
 	SELECT MAX(unit_price), MIN(unit_price) FROM products WHERE discontinued = is_discontinued
 $$ LANGUAGE sql;
@@ -129,22 +120,19 @@ SELECT * FROM get_price_boundaries_by_discont();
 
 
 
---                                    Возврат наборов данных(множества строк)
+--                                    Функции возвращающие множество строк
 
 --see also (todo):
 -- https://dba.stackexchange.com/questions/96109/return-type-of-joining-stored-procedure-postgresql
 
 
--- RETURNS SETOF data_type  - возврат набора скалярных значений (одна колонка) типа data_type
--- RETURNS SETOF table_name - если нужно вернуть все столбцы из таблицы или значения какого-то пользовательского типа
--- RETURNS SETOF record     - только когда типы колонок в результирующем наборе неизвестны
--- RETURNS TABLE (column_name data_type, ...) - тоже что и SETOF table_name, но имеем возможность явно указывать возвращаемые столбцы, тоесть вернуть только необходимые нам столбцы, а не все
-
--- Возврат через out-параметры, как делали выше для скалярных функций, когда опущена запись RETURNS SETOF record, но это будет возврат не множества строк а одной строки с несколькими значениями.
--- RETURNS SETOF record без out-параметров позволяет работать по другому
+-- RETURNS SETOF data_type  - возврат одной колонки типа данных data_type. (набора скалярных значений)
+-- RETURNS SETOF record     - возврат когда типы колонок в результирующем наборе неизвестны. Можно использовать OUT-параметры для этих колонок. Без out-параметров позволяет работать по другому. Если опустить RETURNS SETOF record то вернет одну 1ю строку
+-- RETURNS SETOF table_name - возврат(из запроса функции к оператору) всех столбцов из таблицы или значения какого-то пользовательского типа
+-- RETURNS TABLE (column_name data_type, ...) - возврат(из запроса функции к оператору) только заданных в операторе функции столбцов, а не всех(тоесть невозвращенные будут недоступны при вызове от оператора), тк есть возможность явно указывать возвращаемые столбцы
 
 
--- RETURNS SETOF data_type. Функция возвращает набор значений примитивного типа. Тут средние цены разбитые по категориям
+-- RETURNS SETOF data_type. Функция возвращает столбец значений примитивного типа.
 CREATE OR REPLACE FUNCTION get_average_prices_by_categories() RETURNS SETOF double precision AS $$
 	SELECT AVG(unit_price) FROM products GROUP BY category_id
 $$ LANGUAGE sql;
@@ -152,7 +140,7 @@ $$ LANGUAGE sql;
 SELECT * FROM get_average_prices_by_categories() AS average_prices;
 
 
--- RETURNS SETOF record и OUT-parameters. Функция возвращающая набор(колонки) значений. Например берет суммы и средние цены по категорям продуктов
+-- RETURNS SETOF record + OUT-parameters. Функция возвращающая набор(колонки) значений.
 CREATE OR REPLACE FUNCTION get_prices_by_prod_cats(OUT sum_price real, OUT avg_price float8)
 RETURNS SETOF record AS $$ -- пропишем RETURNS SETOF явно, так мы сможем вернуть столбцы, иначе вернет только 1 строку, первую что встретится видимо
 	SELECT SUM(unit_price), AVG(unit_price) FROM products GROUP BY category_id;
@@ -177,39 +165,24 @@ SELECT * FROM get_average_prices_by_product_categories();
 SELECT * FROM get_average_prices_by_product_categories() AS (sum_price real, avg_price float8);
 
 
--- RETURNS TABLE. Напишем функцию, что вернет клиентов по стране, которая будет входным аргументом
-CREATE OR REPLACE FUNCTION get_customers_by_country(customer_country varchar)
-RETURNS TABLE(char_code char, company_name varchar) AS $$
-	SELECT customer_id, company_name FROM customers WHERE country = customer_country
-$$ LANGUAGE sql;
--- правила селекта вызова функции те же, что и при RETURNS SETOF
-SELECT * FROM get_customers_by_country('USA');
-SELECT company_name FROM get_customers_by_country('USA');
-SELECT char_code, company_name FROM get_customers_by_country('USA');
-
-
 -- RETURNS SETOF table
 CREATE OR REPLACE FUNCTION get_customers_by_country(customer_country varchar) RETURNS SETOF customers AS $$
-	-- SELECT company_name, contact_name  - такая выборка не будет работать, тк мы обязаны вернуть все столбцы
-	SELECT * FROM customers WHERE country = customer_country
+	SELECT * FROM customers WHERE country = customer_country -- SELECT company_name, contact_name  - такая выборка в этом запросе не будет работать, тк мы обязаны вернуть все столбцы
 $$ LANGUAGE sql;
 -- Можем делать и выборки по столбцам и вызывать все
 SELECT * FROM get_customers_by_country('USA');
 SELECT contact_name, city FROM get_customers_by_country('USA');
 
--- Сложный пример
-CREATE OR REPLACE FUNCTION sold_more_than(min_sold_boundary int) RETURNS SETOF products AS $$
-	SELECT * FROM products WHERE product_id IN (
-		SELECT product_id FROM (
-			SELECT SUM(quantity), product_id FROM order_details GROUP BY product_id HAVING SUM(quantity) > min_sold_boundary
-	  ) AS filtered_out
-	)
+
+-- RETURNS TABLE. Напишем функцию, что вернет клиентов по стране, которая будет входным аргументом
+CREATE OR REPLACE FUNCTION get_customers_by_country(customer_country varchar)
+RETURNS TABLE(char_code char, company_name varchar) AS $$  -- явно указываем возвращаемые к оператору столбцы
+	SELECT customer_id, company_name FROM customers WHERE country = customer_country -- теперь можем вернуть к оператору только эти столбцы, а не все
 $$ LANGUAGE sql;
-SELECT sold_more_than(100);
-
-
-
-
+-- правила селекта вызова функции те же, что и при RETURNS SETOF
+SELECT * FROM get_customers_by_country('USA');
+SELECT company_name FROM get_customers_by_country('USA');
+SELECT char_code, company_name FROM get_customers_by_country('USA');
 
 
 

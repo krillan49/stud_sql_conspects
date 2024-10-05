@@ -78,6 +78,15 @@ SELECT * FROM perf_test WHERE LOWER(annotation) LIKE 'ab%'         --> почт�
 EXPLAIN SELECT * FROM perf_test WHERE LOWER(annotation) LIKE 'ab%' --> 'Bitmap Index Scan'
 
 
+-- Пример создания индексов для ускорения запроса с большим числом строк
+CREATE INDEX some_idx1 ON customers(lower(first_name || ' ' || last_name), lower(first_name || ',' || last_name));
+CREATE INDEX some_idx2 ON prospects(lower(full_name));
+SELECT a.first_name, a.last_name, a.credit_limit AS old_limit, max(b.credit_limit) AS new_limit
+FROM customers a JOIN prospects b
+  ON lower(full_name) IN (lower(a.first_name || ' ' || a.last_name), lower(a.last_name || ', ' || a.first_name))
+GROUP BY a.id HAVING MAX(b.credit_limit) > a.credit_limit;
+
+
 
 --                                          Создание индекса GIN
 

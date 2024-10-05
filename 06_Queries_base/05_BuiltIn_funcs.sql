@@ -20,6 +20,8 @@ SELECT hits::FLOAT / at_bats AS average FROM yankees;      -- [postgresql] пр�
 
 --                                        Встроенные функции - разное [PostgreSQL]
 
+-- https://www.postgresql.org/docs/current/functions-net.html   - функции и операторы для айпи адресов
+
 RANDOM()        --  генерит флоат от 0 до 1
 RANDOM()::TEXT  -- сгенерит рандомный текст
 
