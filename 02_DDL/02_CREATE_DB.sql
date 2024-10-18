@@ -36,7 +36,7 @@ END $$;
 CREATE OR REPLACE FUNCTION create_database_if_not_exists(dbname TEXT) RETURNS void AS $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = dbname) THEN
-    EXECUTE format('CREATE DATABASE %I', dbname);
+    EXECUTE FORMAT('CREATE DATABASE %I', dbname);
   END IF;
 END
 $$ LANGUAGE plpgsql;
