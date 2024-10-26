@@ -50,6 +50,18 @@ WINDOW w AS (PARTITION BY rating);  -- WINDOW пишется до ORDER BY
 ORDER BY count
 -- w - название для окна
 
+-- В разделе WINDOW можно создавать несколько описаний окна через запятую. Так же можно компинировать уже созданные описания окна для новых описаний
+SELECT
+  AVG(points) s AS diff_avg,                   -- применяем 1е описание окна
+  RANK() OVER w AS rating,                     -- применяем 2е составное описание окна
+  LAG(points,1,points) OVER w AS next_behind,
+  MAX(points) OVER q AS total_behind,          -- применяем обычное описание окна, аналог составного
+FROM results
+WINDOW s AS(PARTITION BY competition_id),
+       w AS(s ORDER BY points DESC),                          -- создаем еще одно описание окна и используем в нем предыдущее
+       q AS(PARTITION BY competition_id ORDER BY points DESC) -- описание выше полностью аналогично данному
+ORDER BY 1, 4
+
 
 
 --                                          Ранжирующие оконные функции

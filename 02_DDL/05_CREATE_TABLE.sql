@@ -4,27 +4,23 @@
 
 
 -- Варианты создания таблиц для любых СУБД:
-CREATE TABLE "Some" ("id" INTEGER PRIMARY KEY, "Name" TEXT, "Price" INTEGER);                    -- кавычки не обязательны
-CREATE TABLE IF NOT EXISTS "Some" ("id" INTEGER PRIMARY KEY , "Name" TEXT, "Price" INTEGER);     -- создания новой таблицы, если такой еще не существует (избавляет от ошибки если существует)
-CREATE TABLE users (id INT, name VARCHAR(255), age INT, PRIMARY KEY (id));                       -- PRIMARY KEY отдельно в конце
-CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(255) NOT NULL, age INT NOT NULL DEFAULT 18) -- age - поле числового типа со значением по умолчанию равным 18
+CREATE TABLE "Some" ("id" INTEGER PRIMARY KEY, "Name" TEXT, "Price" INTEGER);                     -- кавычки не обязательны
+CREATE TABLE IF NOT EXISTS "Some" ("id" INTEGER PRIMARY KEY , "Name" TEXT, "Price" INTEGER);      -- создания новой таблицы, если такой еще не существует (избавляет от ошибки если существует)
+CREATE TABLE users (id INT, name VARCHAR(255), age INT, PRIMARY KEY (id));                        -- PRIMARY KEY отдельно в конце
+CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(255) NOT NULL, age INT NOT NULL DEFAULT 18); -- age - поле числового типа со значением по умолчанию равным 18
 
 
--- [ SQLite, MySQL ] Создание таблицы с AUTOINCREMENT. Кавычки не обязательны
+-- [ SQLite ] Создание таблицы с AUTOINCREMENT. Кавычки не обязательны
 CREATE TABLE "Some" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "Name" TEXT, "Price" INTEGER);
 
 
--- [ MySQL ] FOREIGN KEY
-CREATE TABLE Users (id INT, name TEXT, company INT, PRIMARY KEY (id), FOREIGN KEY (company) REFERENCES Companies (id)); -- внешний ключ company ссылается на первичный ключ id таблицы Companies
-CREATE TABLE Users (id INT, name TEXT, company INT, PRIMARY KEY (id), FOREIGN KEY (company) REFERENCES Companies (id), FOREIGN KEY (name) REFERENCES People (id)); -- несколько внешних ключей
-CREATE TABLE Users (id INT, name VARCHAR(255) NOT NULL, age INT NOT NULL DEFAULT 18, company INT, PRIMARY KEY (id), FOREIGN KEY (company) REFERENCES Companies (id) ON DELETE RESTRICT ON UPDATE CASCADE);
 
+--                             [PostgreSQL] Создание таблицы с набором ограничений
 
--- [PostgreSQL] Пример создания таблицы с набором ограничений
 CREATE TABLE publisher
 (
   -- Задаем все поля, их типы данных и ограничения которые будут в таблице publisher
-  email VARCHAR(20) PRIMARY KEY,                   -- натуральный первичный ключ на основе имэйла
+  email VARCHAR(20) PRIMARY KEY,                   -- натуральный первичный ключ на основе email
   deleted BOOL DEFAULT(FALSE) NOT NULL,            -- с указанием значения по умолчанию
   registrated TIMESTAMP DEFAULT(NOW()) NOT NULL,
   login VARCHAR(20) NOT NULL UNIQUE,               -- с ограничением на уникальность
@@ -39,17 +35,22 @@ CREATE TABLE publisher
 );
 
 
--- [PostgreSQL] Создание таблицы в конкретной схеме
+
+--                               [PostgreSQL] Создание таблицы в конкретной схеме
+
 CREATE TABLE public.publisher -- тоесть таблица publisher создастся в схеме public
 (
   publisher_id integer NOT NULL,
   org_name character varying(128) NOT NULL,
   address text NOT NULL,
-  CONSTRAINT pk_publisher_id PRIMARY KEY (publisher_id) -- создадим имя для первичного ключа (тут pk_publisher_id - по соглашениям называется как имя столбца с префиксом pk_ для праймари кей)
+  CONSTRAINT pk_publisher_id PRIMARY KEY (publisher_id)
 );
 
 
--- [PostgreSQL] FOREIGN KEY Добавим внешний ключ
+
+--                       [PostgreSQL] Создание таблиц с FOREIGN KEY и различными типами отношений
+
+-- Добавим внешний ключ
 CREATE TABLE public.book
 (
   book_id integer NOT NULL,
@@ -59,16 +60,16 @@ CREATE TABLE public.book
 	CONSTRAINT FK_book_publisher FOREIGN KEY (publisher_id) REFERENCES publisher(publisher_id)
 );
 
--- [PostgreSQL] FOREIGN KEY (отношение 1 ко многим) Cоздадим таблицу с внешним ключем fk_publisher_id ссылающимся на publisher_id таблицы publisher
+-- Отношение 1 ко многим. Cоздадим таблицу с внешним ключем fk_publisher_id ссылающимся на publisher_id таблицы publisher
 CREATE TABLE book (
 	book_id integer PRIMARY KEY,
 	title text NOT NULL,
 	isbn varchar(32) NOT NULL,
-	fk_publisher_id INTEGER REFERENCES publisher(publisher_id) NOT NULL -- В PostgreSQL тут при создании таблтцы не обязвтельно писать FOREIGN KEY, достаточно REFERENCES
+	fk_publisher_id INTEGER REFERENCES publisher(publisher_id) NOT NULL -- Тут при создании таблтцы не обязвтельно писать FOREIGN KEY, достаточно REFERENCES
   -- publisher(publisher_id) - publisher имя таблицы, publisher_id имя поля в таблице на которое мы ссылаемся
 );
 
--- [PostgreSQL] FOREIGN KEY (отношение 1 к 1) создадим таблицу person и с уникальным внешним ключем passport
+-- Отношение 1 к 1. Создадим таблицу person и с уникальным внешним ключем passport
 CREATE TABLE person ( person_id int PRIMARY KEY, first_name varchar(64) NOT NULL, last_name varchar(64) NOT NULL );
 CREATE TABLE passport (
 	passport_id int PRIMARY KEY,
@@ -76,7 +77,7 @@ CREATE TABLE passport (
 	fk_passport_person int UNIQUE REFERENCES person(person_id) -- внешний ключ уникален тк отношение 1 к 1
 );
 
--- [PostgreSQL] (отношение многие ко многим)
+-- Отношение многие ко многим
 CREATE TABLE book ( book_id integer PRIMARY KEY, title text NOT NULL, isbn varchar(32) NOT NULL, );
 CREATE TABLE author ( author_id integer PRIMARY KEY, full_name text NOT NULL, rating real );
 CREATE TABLE book_author (
@@ -86,15 +87,42 @@ CREATE TABLE book_author (
   -- Cоздаем "composite key" - композитный первичный ключ по 2м(или более) колонкам, тк только пара ключей уникальна, а каждый в отдельности может повторяться:
   CONSTRAINT book_author_pkey PRIMARY KEY (book_id, author_id)
 );
--- Далее добавляем значения для каждой из таблиц
+-- Далее можем добавлять значения для каждой из таблиц
 
 
 
---                                     Создание новой таблицы от SELECT-запроса
+--                       [ MySQL ] Пример создания таблиц FOREIGN KEY и другими ограничениями
 
-CREATE TABLE new_some AS
-SELECT * FROM some;
+CREATE TABLE Users (id INT, name TEXT, company INT, PRIMARY KEY (id), FOREIGN KEY (company) REFERENCES Companies (id)); -- внешний ключ company ссылается на первичный ключ id таблицы Companies
 
+-- несколько внешних ключей
+CREATE TABLE Users (
+  id INT,
+  name TEXT,
+  company INT,
+  PRIMARY KEY (id),
+  FOREIGN KEY (company) REFERENCES Companies (id),
+  FOREIGN KEY (name) REFERENCES People (id)
+);
+
+-- FOREIGN KEY с дополнительными опциями
+CREATE TABLE Users (
+  id INT,
+  name VARCHAR(255) NOT NULL,
+  age INT NOT NULL DEFAULT 18,
+  company INT,
+  PRIMARY KEY (id),
+  FOREIGN KEY (company) REFERENCES Companies (id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+
+
+--                                    Создание новой таблицы от SELECT-запроса
+
+-- Синтаксис
+CREATE TABLE new_some AS SELECT * FROM some;
+
+-- Пример
 CREATE TABLE dishes AS
 SELECT id AS restaurant_id, UNNEST(string_to_array(menu, ',')) AS dish FROM restaurants;
 
