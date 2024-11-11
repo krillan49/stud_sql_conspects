@@ -1,7 +1,8 @@
 --                                              RETURNING
 
--- RETURNING - позволяет вернуть данные по модифицированной строке в результате UPDATE или DELETE или INSERT
+-- RETURNING - позволяет вернуть данные по модифицированной строке в результате UPDATE или DELETE или INSERT, в его параметры можно прописать все тоже что и между полями SELECT и FROM селект запроса ?
 
+-- Таблица использующаяся в примерах ниже:
 CREATE TABLE book(
 	book_id SERIAL,
 	title TEXT NOT NULL,
