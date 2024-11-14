@@ -4,7 +4,9 @@
 -- Исходный код библиотеки передан в общественное достояние.
 
 -- Скачивание и установка:
--- https://sqlite.org/index.html  ->  Download  ->  Precompiled Binaries for Windows  ->  https://www.youtube.com/watch?v=ZSOyqH3loss  https://lumpics.ru/how-install-sqlite-on-windows-10/
+-- https://www.sqlite.org/index.html  ->  Download  ->  Precompiled Binaries for Windows -> sqlite-dll-win64-x64-3430200.zip (там лежит фаил dll), его нужно положить в любую директорию, которая видна в переменной среды Path
+-- https://www.youtube.com/watch?v=ZSOyqH3loss
+-- https://lumpics.ru/how-install-sqlite-on-windows-10/
 
 
 -- > sqlite3 --version   -  проверить версию
