@@ -184,24 +184,28 @@ SELECT NOW();
 -- [sqlite3 ?] когда ставим это значением столбца то в него помещается текущие дата и время(часовой пояс -3)
 SELECT DATETIME();
 
+-- [MySQL] DATEDIFF(interval, from, to): interval - дни/месяцы/годы. от даты from до даты to
+SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders;  --> расчет количества дней между OrderTime и DeliveryTime
+-- [MySQL] TIMESTAMPDIFF(SECOND, time_out, time_in) - среднее время в секундах между time_out и time_in
+SELECT TIMESTAMPDIFF(SECOND, time_out, time_in) AS time FROM Trip        --> время полета
+
 -- Вернуть YEAR/MONTH/DAY/HOUR/MINUTE для указанной даты
 SELECT
   EXTRACT(MONTH FROM payment_date) AS month,  -- [PostgreSQL]  Для timestamp without time zone
   EXTRACT(DOW FROM created_at),               -- dow - день недели 0 for Sunday, 1 for Monday, 6 for Saturday
+  extract(year from age(now(), date_of_birth) -- вернет число лет между датами
+  EXTRACT(YEAR from age(date_of_birth))       -- тоже что и выше
   TO_CHAR(rental_date, 'dy'),                 -- день недели: sun, mon, sat
   YEAR("2022-06-16") AS year                  --> 2022 [MySQL ?]
   -- AGE - возвращает число лет до текущей даты в виде интервала:
   AGE(birthdate),                             --> '60 years'   те число лет от даты до сейчас
+  -- Функция age в PostgreSQL возвращает количество лет, месяцев и дней между двумя датами
+  AGE(a::TIMESTAMP, b::TIMESTAMP),            --> 27 years 5 days
   AGE(birthdate) >= '60 years',               --> true         можно сравнивать c другим интервалом
   -- DATE_PART - извлекает часть даты:
   DATE_PART('year', last_date),               -- извлекает год из даты в колонке last_date в виде целого числа
   DATE_PART('day', AGE(age))                  -- возвращает число полных дней от даты до сейчас в виде целого числа
 FROM some;
-
--- [MySQL] DATEDIFF(interval, from, to): interval - дни/месяцы/годы. от даты from до даты to
-SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders;  --> расчет количества дней между OrderTime и DeliveryTime
--- [MySQL] TIMESTAMPDIFF(SECOND, time_out, time_in) - среднее время в секундах между time_out и time_in
-SELECT TIMESTAMPDIFF(SECOND, time_out, time_in) AS time FROM Trip        --> время полета
 
 -- Аналог DATEDIFF для [PostgreSQL]
 -- даты без времени отнимаются по умолчанию в днях без DATEDIFF/DATE_PART
