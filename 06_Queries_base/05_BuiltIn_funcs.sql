@@ -189,6 +189,8 @@ SELECT DATEDIFF(DAY, OrderTime, DeliveryTime) AS AvDelTime FROM Orders;  --> р�
 -- [MySQL] TIMESTAMPDIFF(SECOND, time_out, time_in) - среднее время в секундах между time_out и time_in
 SELECT TIMESTAMPDIFF(SECOND, time_out, time_in) AS time FROM Trip        --> время полета
 
+rental_date::TIME -- урезать датувремя до просто времени отбросив дату
+
 -- Вернуть YEAR/MONTH/DAY/HOUR/MINUTE для указанной даты
 SELECT
   EXTRACT(MONTH FROM payment_date) AS month,  -- [PostgreSQL]  Для timestamp without time zone

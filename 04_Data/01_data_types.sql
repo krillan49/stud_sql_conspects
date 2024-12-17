@@ -217,7 +217,7 @@ SELECT TO_CHAR(NOW(), 'dd/MM/yyyy HH:mi ВАСЯ'); -- помимо кодовы
 SELECT TO_CHAR(NOW(), 'dd/MON/yyyy HH:mi');     -- MON - выведет название месяцев из его первых трех заглавных букв, можно написать и Mon чтобы заглавной была только 1я, либо например Month - выведет полное название месяца
 
 TO_CHAR(NOW(), 'FMmonth, YYYY FMDD HH12:MI:SS')            --> 	february, 2023 19 12:00:00
-TO_CHAR(NOW(), 'FMMonth, YYYY FMDD HH12:MI:SS')            --> 	February, 2023 19 12:00:00
+TO_CHAR(NOW(), 'FMMonth, YYYY FMDD HH12:MI:SS')            --> 	February, 2023 19 12:00:00   FM - убирает лишние пробелы ??
 TO_CHAR('2023-05-08 13:00:00 +0000', 'HH12AM:MI')          -->  01PM:00
 TO_CHAR('2023-05-08 13:00:00 +0000', 'HH12:MI AM')         -->  01:00 PM
 
