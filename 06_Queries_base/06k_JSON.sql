@@ -49,7 +49,6 @@ SELECT
 	product -> 'size' AS size_json,                   -- извлечет элемент(тут массив) по ключу в виде jsonb
 	product ->> 'size' AS size_txt,                   -- извлечет элемент(тут массив) по ключу в виде текста
 	jsonb_array_length(product -> 'size') AS arr_len, -- вернет длинну массива json
-  -- jsonb_array_length - функция возвращает длинну массива jsonb
 	(product -> 'size') ->> 0 AS first_el,            -- вернет элемент с индесом 0 вложенного массива из JSON под ключем 'size'
 	((product -> 'size') ->> 1) :: FLOAT AS second_el -- вернет элемент вложнного массива с последуюзим перемодом во float
 FROM sales

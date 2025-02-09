@@ -29,7 +29,7 @@ WITH film_amount AS (
 SELECT DISTINCT
   SUBSTRING(f.title, 1, 3) AS short_title,
   f.rental_duration,
-  COUNT(*) OVER(PARTITION BY f.rental_duration) AS rent_dur_film_cnt,
+  COUNT(*) OVER(PARTITION BY f.rental_duration) AS rent_dur_film_cnt, -- ??? непонятно как это, веть оконные функции считаются позже чем группировка
   SUM(fa.total_amount) AS total_amount
 -- 2. Выполняется соединение таблиц в результирующий набор блоке FROM
 FROM
