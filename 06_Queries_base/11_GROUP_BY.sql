@@ -1,6 +1,6 @@
 --                                             Группировка и агрегация
 
--- GROUP BY (группировка функций/значений) группирует строки выбранных колонок по их значениям(одинаковые значения группирует в одно - одну строку). Число групп равно числу всех уникальных значений в колонке или колонках по которым проводим группировку, к значениям группируемых колонок нужно применить агрегатную функцию, чтобы объединить их тем или иным способом
+-- GROUP BY - группирует строки выбранных колонок по их значениям или выражениям(одинаковые значения группирует в одно - одну строку). Число групп равно числу всех уникальных значений в колонке или колонках по которым проводим группировку, к значениям группируемых колонок нужно применить агрегатную функцию, чтобы объединить их тем или иным способом
 -- На каждую группу в итоге будет выведена одна строка
 
 
@@ -8,7 +8,7 @@
 SELECT home_type FROM Rooms GROUP BY home_type; -- все сгруппированные типы значений в home_type
 
 -- GROUP BY pасполагается между WHERE и ORDER BY. WHERE фильтрует строки до группировки
-SELECT home_type FROM Rooms GROUP BY home_type WHERE sum > 10 ORDER BY home_type;
+SELECT home_type FROM Rooms WHERE sum > 10 GROUP BY home_type ORDER BY home_type;
 
 -- При группировке можем ссылаться на псевдонимы
 SELECT home_type h FROM Rooms GROUP BY h;
@@ -24,7 +24,7 @@ SELECT home_type, street, AVG(price) ap FROM Rooms GROUP BY home_type, street;
 
 -- 4. Группируем по результату функции(по выражению) над колонкой
 SELECT YEAR(OrderTime) yr, SUM(OrderTotal) st FROM Orders GROUP BY YEAR(OrderTime); -- группируем по годам из OrderTime, соотв сумма OrderTotal будет за каждый год, а не за каждую полную дату
-SELECT SUBSTRING(name, 1, 1) AS a, SUM(OrderTotal) st FROM Orders GROUP BY SUBSTRING(name, 1, 1); -- группируем по первой букве имени
+SELECT SUBSTRING(name, 1, 1) AS a, SUM(OrderTotal) st FROM Orders GROUP BY SUBSTRING(name, 1, 1); -- по первой букве имени
 SELECT f_name || l_name AS name, SUM(OrderTotal) st FROM Orders GROUP BY f_name || l_name;
 
 
@@ -33,13 +33,13 @@ SELECT f_name || l_name AS name, SUM(OrderTotal) st FROM Orders GROUP BY f_name 
 
 -- ROLLUP(col1, col2, ... coln) - группировка по разному колличеству полей сразу - сначала по всем, потом по всем кроме последнего, потом по всем кроме последних 2х ..итд, потом по первому.
 SELECT name, EXTRACT(MONTH FROM date) AS month, EXTRACT(DAY FROM date) AS day, SUM(price * count) AS total FROM products
-GROUP BY ROLLUP(name, month, day)
+GROUP BY ROLLUP(name, month, day);
 -- получаем сначала общую цену по товару за каждый день, потом за месяц, потом за все время
 
 
--- GROUPING SETS() - группировка по разному коллич полей сразу - по кастомным наборам
+-- GROUPING SETS() - группировка по разному колличеству полей сразу - по кастомным наборам
 SELECT name, EXTRACT(MONTH FROM date) AS month, EXTRACT(DAY FROM date) AS day, SUM(price * count) AS total FROM products
-GROUP BY GROUPING SETS ((name, month), (name, month, day), (name, day), (name))
+GROUP BY GROUPING SETS ((name, month), (name, month, day), (name, day), (name));
 
 
 
@@ -72,7 +72,7 @@ SELECT home_type, COUNT(*) AS amount FROM Rooms GROUP BY home_type;  -- счит
 SELECT SUM(OrderTotal) FROM Orders WHERE OrderTime > '2013-01-01';  -- сумма тех значений столбца OrderTotal в которых в столбце OrderTime значение больше указанного
 
 
--- MIN/MAX(имя_столбца) - возвращают наименьшее или наибольшее значение для подгруппы указанного столбца, работает не только на числа но и на символы и на даты.
+-- MIN/MAX(имя_столбца) - возвращают наименьшее или наибольшее значение для подгруппы указанного столбца, работает не только на числа, но и на символы и даты.
 SELECT MIN(OrderTime) AS min, MAX(OrderTime) AS max FROM Orders;               -- строка с самой маленькой и самой большой датой
 SELECT YEAR(Otime) AS y, MAX(Total) AS m FROM Orders GROUP BY YEAR(Otime);     -- максимальные значения колонки Total по годам
 SELECT room_id, MAX(end_date) AS last_date FROM Reservations GROUP BY room_id; -- самые позние даты выезда сгруппированные по номерам комнат
@@ -94,7 +94,7 @@ SELECT ARRAY_AGG(name ORDER BY id DESC) AS names FROM students GROUP BY subject;
 SELECT m_id, ARRAY_AGG(name || '-' || id ORDER BY id) AS en FROM emps GROUP BY m_id; -- группируем результаты операции
 
 
--- STRING_AGG(column, разделитель порядок) [PostgreSQL ??] тоесть все значения группы записываются в одну строку
+-- STRING_AGG(column, разделитель порядок) [PostgreSQL ??] тоесть все значения группы записываются в одну строку, через указанный разделитель
 SELECT somr, STRING_AGG(str, ', ' ORDER BY course_name) FROM tab GROUP BY some;
 SELECT somr, STRING_AGG(course_name || '-' || score, ', ' ORDER BY course_name) FROM tab GROUP BY some;
 

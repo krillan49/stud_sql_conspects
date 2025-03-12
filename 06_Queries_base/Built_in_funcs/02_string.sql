@@ -9,7 +9,8 @@ SELECT
   UPPER('Hello world') AS upstring,  --> 'HELLO WORLD'  Возвращает строку в верхнем регистре
   LOWER('SQL Academy'),              --> 'sql academy'  Возвращает строку в нижнем регистре
   INITCAP(name),                     -- Capitalize name
-  REVERSE(chars)                     -- реверсирует строку
+  REVERSE(chars),                    -- реверсирует строку
+  LPAD('1', 2, '0')                  --> '001'  добавляет ведущие символы к тексту (тоесть слева)
 FROM some;
 
 -- Преобразование частей строк

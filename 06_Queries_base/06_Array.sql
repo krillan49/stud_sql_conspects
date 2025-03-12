@@ -109,6 +109,19 @@ SELECT UNNEST(ARRAY[1, 2, 3, 4, 5]) AS n, UNNEST(ARRAY[1, 2, 6, 24, 120]) AS res
 
 
 
+--                                             Сортировка массива
+
+-- [PostgreSQL] для сортировки массива можно использовать функцию `unnest()` совместно с оператором `ORDER BY`
+-- unnest(ARRAY[...])            - разбивает массив на строки.
+-- ORDER BY 1                    - сортирует эти строки.
+-- ARRAY(...)                    - собирает отсортированные строки обратно в массив.
+
+SELECT ARRAY(SELECT unnest(ARRAY[5, 2, 8, 1, 4]) ORDER BY 1) AS sorted_array;
+SELECT ARRAY(SELECT unnest(ARRAY['banana', 'apple', 'cherry', 'date']) ORDER BY 1) AS sorted_array;
+SELECT id, ARRAY(SELECT unnest(fruit_names) ORDER BY 1) AS sorted_fruit_names FROM fruits;
+
+
+
 --                                        Преобразование массива в текст
 
 -- ARRAY_TO_STRING() - встроенная функция PostgreSQL, которая преобразует заданный массив в строки(TEXT)
