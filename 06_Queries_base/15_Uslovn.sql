@@ -10,7 +10,7 @@ SELECT id, n % x = 0 AND n % y = 0 AS res FROM kata;
 -- Синтаксис стандартный:
 CASE
   WHEN условие_1      -- условие пишется после ключевого слова WHEN
-    THEN результат_1  -- значениечто вернет условный оператор CASE, если условие_1 вернет TRUE
+    THEN результат_1  -- значение что вернет условный оператор CASE, если условие_1 вернет TRUE
   -- Может быть несколько условий, если первое вернет FALSE то переходит ко второму условию, тотом к третьему итд
   WHEN условие_2 THEN результат_2
   -- ELSE - вернет данный результат, если все условия выше вернули FALSE. Если не указать ELSE и все условия окажутся не верны то условный оператор CASE вернет NULL
@@ -67,7 +67,7 @@ FROM Class
 SELECT neme, SUM(num)
   -- Можно производить агрегацию внутри условия:
   CASE
-    WHEN SUM(num) >= 150 THEN 'Top' -- используем агрегацию, чтобы вернуть просто значение врезультат группировки этой колонки
+    WHEN SUM(num) >= 150 THEN 'Top' -- используем агрегацию, чтобы вернуть просто значение в результат группировки этой колонки
     WHEN SUM(num) + 5 > 100 THEN 'Mid'
     ELSE SUM(num)                   -- вернем результат агрегации
   END AS rating,
@@ -89,7 +89,7 @@ SELECT * FROM film WHERE length > CASE WHEN rating = 'G' THEN 90 ELSE 120 END;
 
 
 -- 4. JOIN ON - результат CASE в зоне JOIN ON для вычисления условий соединения
-SELECT * FROM class JOIN class2 ON CASE WHEN class.grade = 'A' THEN 1 ELSE class.subject_id = class2.subject_id END; -- тоесть соединяем строку 2й таблицы в которой subject_id будет соответсвовать обределенному текстовому значению из class.grade если 1е условие срабатывает, остальное будем соединять по соответсвию айди
+SELECT * FROM class JOIN class2 ON CASE WHEN class.grade = 'A' THEN 1 ELSE class.subject_id = class2.subject_id END; -- ??? тоесть соединяем строку 2й таблицы, в которой subject_id будет соответсвовать определенному текстовому значению из class.grade если 1е условие срабатывает, остальное будем соединять по соответсвию айди ???
 
 
 
@@ -99,7 +99,7 @@ SELECT * FROM class JOIN class2 ON CASE WHEN class.grade = 'A' THEN 1 ELSE class
 SELECT COALESCE(NULL, NULL, 1, 2, NULL, 3) FROM some;                      --> 1
 SELECT name, COALESCE(bonus1, bonus2, 1000000) AS bonus FROM table_name;   -- если bonus1 == NULL выбирает значение bonus2 если и оно == NULL, тогда выбирает 1000000
 
--- COALESCE - предполагает принятие во все аргументы данные одного и того же типа(или NULL), тк помещает их в одну колонку, поэтому может потребоваться применить преобразование типов
+-- COALESCE предполагает, что все аргументы это данные одного и того же типа или NULL, тк помещает их в одну колонку, поэтому может потребоваться применить преобразование типов
 SELECT COALESCE(order_id::TEXT, 'no orders') FROM customers;
 
 -- Замена других значений в комбинации с NULLIF
