@@ -68,6 +68,104 @@ ORDER BY first_name, last_name;
 
 
 
+--                                   Разворачивание в строки и сложные извлечения
+
+-- Как масиив jsonb [{"name": "Lenita", "type": "Dog"}, {"name": "Mauricio", "type": "Dog"}] преобразовать в массив [ "Lenita",  "Mauricio"], извлекая значение ключа "name".
+
+-- 1. Используя `jsonb_array_elements` и `->>`. Этот метод разворачивает JSON-массив в набор JSON-объектов, а затем извлекает текстовое значение из каждого объекта.
+SELECT array_agg(element->>'name') AS names
+FROM jsonb_array_elements('[{"name": "Lenita", "type": "Dog"}, {"name": "Mauricio", "type": "Dog"}]') AS element;
+-- jsonb_array_elements(jsonb)  -  Разворачивает JSON-массив, содержащийся в `jsonb`, в набор JSON-значений.  Каждое значение становится отдельной строкой в результирующем наборе.
+-- element->>'name' - Извлекает текстовое значение, связанное с ключом `name` из каждого JSON-объекта `element`. Оператор `->>` преобразует извлеченное значение в текст.
+-- array_agg(text) - Собирает набор текстовых значений в массив.
+
+-- 2. Используя `jsonb_path_query_array` и `jsonb_array_elements_text` (Для Postgresql 12 и новее). Этот метод использует JSONPath для извлечения всех значений "name" как массив `jsonb`, а затем преобразует этот массив в массив текстовых значений.
+SELECT jsonb_array_elements_text(jsonb_path_query_array('[{"name": "Lenita", "type": "Dog"}, {"name": "Mauricio", "type": "Dog"}]', '$[*].name'));
+-- или
+SELECT array_agg(x)
+FROM jsonb_array_elements_text(jsonb_path_query_array('[{"name": "Lenita", "type": "Dog"}, {"name": "Mauricio", "type": "Dog"}]', '$[*].name')) as x;
+-- jsonb_path_query_array(jsonb, jsonpath) - Извлекает значения из JSON `jsonb` в соответствии с выражением JSONPath `jsonpath` и возвращает массив `jsonb`.
+-- '$[*].name' - jsonpath извлекает все значения, связанные с ключом "name" во всех объектах массива.
+-- jsonb_array_elements_text(jsonb) - Разворачивает массив `jsonb`, содержащий текстовые элементы, в набор текстовых значений.  Каждое значение становится отдельной строкой
+-- array_agg(text) - Собирает набор текстовых значений в массив.
+
+
+
+--                                          Информационные методы
+
+-- `?` (exists) - оператор проверяет наличие элемента в массиве `jsonb`.  Это самый простой и обычно самый быстрый способ для проверки наличия конкретного элемента.
+SELECT jsonb_contains('["Lenita", "Mauricio", "Jene"]', '"Lenita"');        -- Возвращает true
+SELECT jsonb_contains('["Lenita", "Mauricio", "Jene"]', '"Lenita"'::jsonb); -- Альтернативный вариант с явным указанием типа
+SELECT '["Lenita", "Mauricio", "Jene"]'::jsonb ? 'Lenita';                  -- Возвращает true (более краткая запись)
+
+
+-- В Postgresql для проверки наличия элемента в массиве `jsonb`, начинающегося с определенной подстроки, можно использовать комбинацию операторов и функций:
+SELECT * FROM your_table
+WHERE EXISTS (
+  SELECT 1
+  FROM jsonb_array_elements_text(your_jsonb_column) AS element
+  WHERE element LIKE 'M%'
+);
+-- jsonb_array_elements_text(your_jsonb_column) - функция разворачивает массив `jsonb` в набор строк. Она преобразует каждый элемент массива в текстовую строку (так как `LIKE` работает со строками).
+-- AS element - gрисваивает псевдоним `element` каждой строке (элементу массива).
+-- WHERE element LIKE 'M%' - оператор `LIKE` для проверки, начинается ли строка `element` с буквы "M"
+-- EXISTS (SELECT 1 ...) - gроверяет, существует ли хотя бы одна строка (элемент массива), которая удовлетворяет условию `LIKE 'M%'`. Если хотя бы один элемент подходит, `EXISTS` вернет `TRUE`, и строка из `your_table` будет включена в результаты.
+
+
+
+--                                            Преобразование JSON
+
+-- В PostgreSQL есть несколько способов объединить массив JSONB в строку:
+
+-- 1. Используя `jsonb_array_elements_text` и `string_agg` (Наиболее универсальный способ) Этот метод работает в большинстве версий PostgreSQL и позволяет контролировать разделитель:
+SELECT string_agg(elem, ', ')  -- Замените ', ' на нужный разделитель
+FROM (
+  SELECT jsonb_array_elements_text('[ "Lenita",  "Mauricio",  "Jene"]') AS elem
+) AS subquery; --> Lenita, Mauricio, Jene
+-- jsonb_array_elements_text(jsonb) - Разворачивает массив JSONB в набор строк, где каждый элемент массива представлен как строка.
+-- string_agg(text, text) - Агрегирует набор строк в одну строку, используя заданный разделитель.
+
+-- 2. Используя `jsonb_path_query_array` и `string_agg` (Более современный способ, начиная с Postgres 12), использует JSONPath для получения элементов массива, что может быть более эффективным для больших JSONB-документов.
+SELECT string_agg(elem, ', ')
+FROM (
+  SELECT jsonb_path_query_array('[ "Lenita",  "Mauricio",  "Jene"]', '$[*]')::text AS elem
+) AS subquery; --> Lenita, Mauricio, Jene
+-- jsonb_path_query_array(jsonb, jsonpath) -  Извлекает JSONB массив из JSONB документа, используя JSONPath. В данном случае, `'$[*]'` выбирает все элементы массива.
+-- ::text -  Преобразует каждый элемент JSONB в текстовую строку.
+-- string_agg(text, text) -  Агрегирует набор строк в одну строку, используя заданный разделитель.
+
+
+-- Объединить массив `jsonb` в строку в Postgresql, если этот массив находится в колонке таблицы и вам нужно учитывать другие колонки
+-- Предположим, есть таблица `users` со следующими колонками:
+-- *   `id` (integer):    Уникальный идентификатор пользователя
+-- *   `username` (text): Имя пользователя
+-- *   `names` (jsonb):   Массив имен (например, `["Lenita", "Mauricio", "Jene"]`)
+
+-- Решение 1: Используя `jsonb_array_elements_text` и `string_agg`
+SELECT
+  id,
+  username,
+  string_agg(name, ', ' ORDER BY name) AS full_name
+FROM users
+CROSS JOIN LATERAL jsonb_array_elements_text(names) AS name
+GROUP BY id, username;
+-- jsonb_array_elements_text(names) - Эта функция разворачивает массив `jsonb` в набор строк.  `LATERAL` позволяет обращаться к этой "временной таблице" в основном запросе.
+-- string_agg(name, ', ' ORDER BY name) -  Эта функция агрегирует (объединяет) значения `name` (которые стали строками из массива) в одну строку, разделяя их запятой и пробелом.  `ORDER BY name` опционально сортирует имена перед объединением.
+-- GROUP BY id, username -  Обязателен, так как мы используем агрегатную функцию `string_agg`
+
+-- Решение 2: Используя `jsonb_path_query_array` и `string_agg` (для более сложных случаев) Этот подход более полезен, если вам нужно выбрать только *определенные* элементы из JSON-массива, используя JSON path.  Он также может быть полезен для сложных JSON-структур.
+SELECT
+  id,
+  username,
+  string_agg(name, ', ' ORDER BY name) AS full_name
+FROM users
+CROSS JOIN LATERAL jsonb_path_query_array(names, '$[*]') AS name_array
+CROSS JOIN LATERAL jsonb_array_elements_text(name_array) AS name
+GROUP BY id, username;
+-- jsonb_path_query_array(names, '$[*]')` -  Это извлекает все элементы массива `names` как новый `jsonb` массив. `'$[*]'` - это JSON Path, который выбирает все элементы корневого массива.  (Эквивалентно `names` в первом примере).
+-- Остальное аналогично первому решению.
+
+
 
 
 

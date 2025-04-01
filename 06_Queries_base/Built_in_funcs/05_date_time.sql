@@ -20,10 +20,10 @@ SELECT DATETIME();
 -- Части дат например YEAR/MONTH/DAY/HOUR/MINUTE для указанной даты
 
 -- [PostgreSQL] EXTRACT - возвращшает элемент даты для для timestamp without time zone
-EXTRACT(MONTH FROM payment_date) AS month   -- вернуть месяц
-EXTRACT(DOW FROM created_at)                -- день недели (0 - Sunday, 1 - Monday, 6 - Saturday)
-EXTRACT(year FROM AGE(NOW(), date_of_birth) -- число лет между датами
-EXTRACT(YEAR FROM AGE(date_of_birth))       -- тоже что и выше
+EXTRACT(MONTH FROM payment_date) AS month    -- вернуть месяц
+EXTRACT(DOW FROM created_at)                 -- день недели (0 - Sunday, 1 - Monday, 6 - Saturday)
+EXTRACT(year FROM AGE(NOW(), date_of_birth)) -- число лет между датами
+EXTRACT(YEAR FROM AGE(date_of_birth))        -- тоже что и выше
 -- interval в "(DAY FROM interval ..." надо писать только если интервал в виде строки а не интервала
 EXTRACT(DAY FROM interval '1 day 37:20:44')          -- извлекает количество дней (в данном случае 1)
 EXTRACT(HOUR FROM interval '1 day 37:20:44')         -- извлекает часы (в данном случае 37)
