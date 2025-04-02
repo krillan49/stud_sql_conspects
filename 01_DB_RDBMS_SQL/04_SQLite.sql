@@ -1,12 +1,20 @@
 --                                              SQLite
 
 -- SQLite — это библиотека на языке C, которая реализует небольшой, автономный, полнофункциональный механизм базы данных SQL, те компактная встраиваемая СУБД. Легковесна и может быть встроенной в отдельные приложения. Не расчитана на использование по сети и высокие нагрузки.
+
+-- В отличие от других СУБД не запускает свой сервер, а является как бы частью приложения в котором используется (? кажая БД содержит СУБД ?)
+
+-- Расширения для фаила БД: sqlite, sqlite3, db ...
+
 -- Исходный код библиотеки передан в общественное достояние.
 
--- Скачивание и установка:
--- https://www.sqlite.org/index.html  ->  Download  ->  Precompiled Binaries for Windows -> sqlite-dll-win64-x64-3430200.zip (там лежит фаил dll), его нужно положить в любую директорию, которая видна в переменной среды Path
+-- Скачивание и установка для Windows:
+-- https://www.sqlite.org/index.html  ->  Download  ->  Precompiled Binaries for Windows -> sqlite-dll-win64-x64-3430200.zip (там лежит фаил dll, его нужно положить в любую директорию, которая видна в переменной среды Path)
 -- https://www.youtube.com/watch?v=ZSOyqH3loss
+-- https://www.youtube.com/watch?v=m2lc9eG-40k  +  https://www.youtube.com/watch?v=sJJaLHNmNgM
 -- https://lumpics.ru/how-install-sqlite-on-windows-10/
+
+-- На Мак и ?Линукс? стоит по умолчанию
 
 
 -- > sqlite3 --version   -  проверить версию
