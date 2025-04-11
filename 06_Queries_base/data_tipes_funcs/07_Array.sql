@@ -95,6 +95,11 @@ ARRAY_APPEND(arr, element)      --> arr
 SELECT ARRAY_REMOVE(arr, NULL) AS ar FROM some    -- тут удаляем значения NULL
 
 
+-- PostgreSQL удаление дубликатов из массива при помощи ARRAY_AGG(DISTINCT):
+SELECT ARRAY_AGG(DISTINCT element ORDER BY element) FROM UNNEST(ARRAY[1, 2, 2, 3, 4, 4, 5]) AS element; --> {1,2,3,4,5}
+SELECT other_column, ARRAY(SELECT DISTINCT val FROM UNNEST(my_array) AS val) AS arr FROM my_table; -- если есть другие колонки
+
+
 
 --                                      Преобразомание массива в строки таблицы
 

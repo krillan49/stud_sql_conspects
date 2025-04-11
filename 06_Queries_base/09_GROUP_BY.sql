@@ -97,6 +97,7 @@ SELECT m_id, ARRAY_AGG(name || '-' || id ORDER BY id) AS en FROM emps GROUP BY m
 -- STRING_AGG(column, разделитель порядок) [PostgreSQL ??] тоесть все значения группы записываются в одну строку, через указанный разделитель
 SELECT somr, STRING_AGG(str, ', ' ORDER BY course_name) FROM tab GROUP BY some;
 SELECT somr, STRING_AGG(course_name || '-' || score, ', ' ORDER BY course_name) FROM tab GROUP BY some;
+SELECT category, STRING_AGG(DISTINCT name, ', ' ORDER BY name) AS u_p FROM products GROUP BY category;  -- при помощи DISTINCTв итоговом массиве удалятся все дубликаты и останутся только уникаьные значения, ?? оязательно чтобы поле в ORDER BY было и в DISTINCT ??
 
 
 -- BOOL_AND(price > 200) [PostgreSQL ??] - принимает логическое выражение и возвращает TRUE если для каждой строки в группе условие истинно иначе FALSE
