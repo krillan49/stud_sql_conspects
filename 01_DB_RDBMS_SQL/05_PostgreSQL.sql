@@ -21,7 +21,7 @@
 
 
 
---                                       Скачивание и установка
+--                                        Скачивание и установка
 
 -- https://www.postgresql.org/download/
 -- https://www.enterprisedb.com/downloads/postgres-postgresql-downloads                         - сразу страница скачивания
@@ -37,6 +37,13 @@
 -- Порт: 5432
 -- Локаль: по умолчанию
 -- Stack Builder по завершению можно снять галочку и не запускать
+
+
+
+--                                            Консоль PostgreSQL
+
+-- (?? Потом пересмотреть и записать команды ??)
+-- https://www.youtube.com/watch?v=xg-oB5kzTMY   (7-00) Работа с консолью, создание и смена пользователей БД, создание БД
 
 
 
